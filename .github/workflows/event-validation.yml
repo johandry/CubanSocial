@@ -1,0 +1,164 @@
+name: Event Validation
+
+on:
+  pull_request:
+    paths:
+      - 'data/events-pending/**'
+      - 'data/events/**'
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-events:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install ajv ajv-formats
+        
+    - name: Create validation script
+      run: |
+        cat > validate-events.js << 'EOF'
+        const Ajv = require('ajv');
+        const addFormats = require('ajv-formats');
+        const fs = require('fs');
+        const path = require('path');
+        
+        const ajv = new Ajv();
+        addFormats(ajv);
+        
+        // Event schema
+        const eventSchema = {
+          type: 'object',
+          properties: {
+            id: { type: 'string', pattern: '^event-' },
+            name: { type: 'string', minLength: 5, maxLength: 100 },
+            date: { type: 'string', format: 'date-time' },
+            location: { type: 'string', minLength: 10 },
+            maps_link: { type: 'string', format: 'uri' },
+            type: { 
+              type: 'array', 
+              items: { 
+                type: 'string', 
+                enum: ['salsa', 'timba', 'bachata', 'merengue', 'rueda'] 
+              },
+              minItems: 1
+            },
+            music: { type: 'string', enum: ['Live', 'DJ', 'Mixed', ''] },
+            price: { type: 'string' },
+            description: { type: 'string' },
+            contact: { type: 'string' },
+            featured: { type: 'boolean' },
+            recurring: { type: 'string', enum: ['weekly', 'monthly', 'biweekly', ''] },
+            created_at: { type: 'string', format: 'date-time' }
+          },
+          required: ['id', 'name', 'date', 'location', 'maps_link', 'type'],
+          additionalProperties: true
+        };
+        
+        const validate = ajv.compile(eventSchema);
+        
+        function validateEventFile(filePath) {
+          try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const event = JSON.parse(content);
+            
+            // Check if date is in the future
+            const eventDate = new Date(event.date);
+            const now = new Date();
+            if (eventDate <= now) {
+              console.error(`❌ Error in ${filePath}: Event date must be in the future`);
+              return false;
+            }
+            
+            const valid = validate(event);
+            if (!valid) {
+              console.error(`❌ Validation errors in ${filePath}:`);
+              console.error(validate.errors);
+              return false;
+            }
+            
+            console.log(`✅ ${filePath} is valid`);
+            return true;
+          } catch (error) {
+            console.error(`❌ Error reading/parsing ${filePath}:`, error.message);
+            return false;
+          }
+        }
+        
+        // Get changed files from git
+        const { execSync } = require('child_process');
+        const changedFiles = execSync('git diff --name-only HEAD~1 HEAD', { encoding: 'utf8' })
+          .split('\n')
+          .filter(file => file.endsWith('.json') && (file.includes('events-pending') || file.includes('events')))
+          .filter(file => file.length > 0);
+        
+        if (changedFiles.length === 0) {
+          console.log('No event files to validate');
+          process.exit(0);
+        }
+        
+        console.log('Validating event files:', changedFiles);
+        
+        let allValid = true;
+        for (const file of changedFiles) {
+          if (fs.existsSync(file)) {
+            const isValid = validateEventFile(file);
+            if (!isValid) allValid = false;
+          }
+        }
+        
+        if (!allValid) {
+          console.error('❌ Some event files failed validation');
+          process.exit(1);
+        }
+        
+        console.log('✅ All event files are valid!');
+        EOF
+        
+    - name: Validate event files
+      run: node validate-events.js
+      
+    - name: Check for required fields
+      run: |
+        echo "Checking for required fields in event submissions..."
+        
+        # Check if this is an event submission PR
+        if [[ "${{ github.event.pull_request.title }}" == *"Add event:"* ]]; then
+          echo "✅ This is an event submission PR"
+          
+          # Check if files are in the correct directory
+          changed_files=$(git diff --name-only HEAD~1 HEAD | grep "\.json$" | grep "events-pending")
+          if [[ -n "$changed_files" ]]; then
+            echo "✅ Event files are in events-pending directory"
+          else
+            echo "❌ Event files should be in data/events-pending/ directory"
+            exit 1
+          fi
+        fi
+
+  notify-admins:
+    runs-on: ubuntu-latest
+    needs: validate-events
+    if: github.event.action == 'opened' && contains(github.event.pull_request.title, 'Add event:')
+    
+    steps:
+    - name: Notify admins of new event submission
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '🎉 **New Event Submission!** 🎉\n\nAdmins, please review this event submission using the checklist in the PR template.\n\n📧 **Alternative contact methods:**\n- Instagram: [@cubansocial](https://instagram.com/cubansocial)\n- Email: cubansocial@gmail.com\n\nThank you for contributing to Cuban Social! 🇨🇺💃🕺'
+          });

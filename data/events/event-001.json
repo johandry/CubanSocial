@@ -1,0 +1,14 @@
+{
+  "id": "event-001",
+  "name": "Salsa Night at Mango's",
+  "date": "2025-07-25T20:00:00",
+  "location": "Mango's Tropical Cafe, 900 Ocean Dr, San Diego Beach, CA 92109",
+  "maps_link": "https://maps.google.com/?q=Mango's+Tropical+Cafe+900+Ocean+Dr+San+Diego+Beach+CA",
+  "type": ["salsa", "bachata"],
+  "music": "DJ",
+  "price": "$15",
+  "description": "Join us for an amazing night of salsa and bachata dancing with San Diego's hottest DJs!",
+  "contact": "@mangos_sandiego",
+  "featured": false,
+  "created_at": "2025-07-20T10:00:00Z"
+}

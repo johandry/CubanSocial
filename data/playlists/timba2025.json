@@ -1,0 +1,35 @@
+{
+  "id": "timba2025",
+  "name": "Best Timba Tracks 2025",
+  "description": "The hottest timba songs to get your body moving",
+  "created_at": "2025-07-20T10:00:00Z",
+  "updated_at": "2025-07-20T10:00:00Z",
+  "tracks": [
+    {
+      "title": "La Vida Es Un Carnaval",
+      "artist": "Celia Cruz",
+      "album": "Mi Vida Es Cantar",
+      "year": 1998,
+      "spotify_url": "https://open.spotify.com/track/example1",
+      "youtube_url": "https://www.youtube.com/watch?v=example1"
+    },
+    {
+      "title": "El Cuarto de Tula",
+      "artist": "Buena Vista Social Club",
+      "album": "Buena Vista Social Club",
+      "year": 1997,
+      "spotify_url": "https://open.spotify.com/track/example2",
+      "youtube_url": "https://www.youtube.com/watch?v=example2"
+    },
+    {
+      "title": "Tiene Sabor",
+      "artist": "La Charanga Habanera",
+      "album": "Tremendo Delirio",
+      "year": 1997,
+      "spotify_url": "https://open.spotify.com/track/example3",
+      "youtube_url": "https://www.youtube.com/watch?v=example3"
+    }
+  ],
+  "tags": ["timba", "salsa", "cuban", "high-energy"],
+  "featured": true
+}

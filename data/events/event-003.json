@@ -1,0 +1,14 @@
+{
+  "id": "event-003",
+  "name": "Bachata Sensual Workshop",
+  "date": "2025-07-27T19:00:00",
+  "location": "Dance Studio San Diego, 1420 Camino De La Reina, San Diego, CA 92108",
+  "maps_link": "https://maps.google.com/?q=Dance+Studio+San+Diego+1420+Camino+De+La+Reina+San+Diego+CA",
+  "type": ["bachata"],
+  "music": "Mixed",
+  "price": "$25",
+  "description": "Learn the sensual moves of bachata with professional instructors. Followed by social dancing.",
+  "contact": "(305) 555-0123",
+  "featured": false,
+  "created_at": "2025-07-20T11:30:00Z"
+}

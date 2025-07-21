@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuban Social - Dance Events in San Diego</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">Cuban Social</h1>
+                <nav class="nav">
+                    <a href="#home" class="nav-link">Home</a>
+                    <a href="#events" class="nav-link">Events</a>
+                    <a href="#congresses" class="nav-link">Congresses</a>
+                    <a href="#playlists" class="nav-link">Playlists</a>
+                    <a href="#submit" class="nav-link">Submit Event</a>
+                </nav>
+                <div class="social-links">
+                    <a href="https://instagram.com/cubansocial" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://facebook.com/cubansocial" target="_blank"><i class="fab fa-facebook"></i></a>
+                    <a href="https://tiktok.com/@cubansocial" target="_blank"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://youtube.com/cubansocial" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="home-section">
+            <!-- Featured Events Section -->
+            <div class="featured-section">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Featured Events</h2>
+                        <div class="pinned-indicator">
+                            <i class="fas fa-star"></i> Pinned
+                        </div>
+                    </div>
+                    <div id="featured-events" class="featured-events-grid">
+                        <!-- Featured events will be loaded here via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="container">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label for="dance-filter">Dance Type:</label>
+                            <select id="dance-filter" class="filter-select">
+                                <option value="">All</option>
+                                <option value="salsa">Salsa</option>
+                                <option value="timba">Timba</option>
+                                <option value="bachata">Bachata</option>
+                                <option value="merengue">Merengue</option>
+                                <option value="rueda">Rueda de Casino</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="music-filter">Music:</label>
+                            <select id="music-filter" class="filter-select">
+                                <option value="">All</option>
+                                <option value="Live">Live</option>
+                                <option value="DJ">DJ</option>
+                                <option value="Mixed">Mixed</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="location-filter">Location:</label>
+                            <input type="text" id="location-filter" class="filter-input" placeholder="Enter city...">
+                        </div>
+                        <div class="view-toggle">
+                            <button id="calendar-view" class="view-btn">
+                                <i class="fas fa-calendar"></i> Calendar
+                            </button>
+                            <button id="list-view" class="view-btn active">
+                                <i class="fas fa-list"></i> List
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Section -->
+            <div id="calendar-container" class="calendar-section" style="display: none;">
+                <div class="container">
+                    <div class="calendar-header">
+                        <button id="prev-month" class="calendar-nav"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="calendar-title">February 2025</h3>
+                        <button id="next-month" class="calendar-nav"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">Sun</div>
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
+                        <!-- Calendar days will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events Section -->
+            <div class="upcoming-section">
+                <div class="container">
+                    <h2>Upcoming Events</h2>
+                    <div id="events-list" class="events-list">
+                        <!-- Events will be loaded here via JavaScript -->
+                    </div>
+                    <button id="load-more" class="load-more-btn">Load More Events</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Sections (Events, Congresses, Playlists) -->
+        <section id="events" class="section" style="display: none;">
+            <div class="container">
+                <h2>All Events</h2>
+                <div class="events-grid" id="all-events-grid">
+                    <!-- All events will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="congresses" class="section" style="display: none;">
+            <div class="container">
+                <h2>Dance Congresses</h2>
+                <div class="congress-list" id="congress-list">
+                    <!-- Congress information will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="playlists" class="section" style="display: none;">
+            <div class="container">
+                <h2>Music Playlists</h2>
+                <div class="playlist-grid" id="playlist-grid">
+                    <!-- Playlists will be loaded here -->
+                </div>
+            </div>
+        </section>
+        <!-- Submit Event Form Section -->
+        <section id="submit" class="submit-section section" style="display: none;">
+            <div class="container">
+                <h2><i class="fas fa-plus-circle"></i> Submit an Event</h2>
+                <p class="section-description">
+                    Help grow the Cuban dance community by submitting events! Your submission will create a request for admin review.
+                </p>
+                
+                <form id="event-form" class="event-form">
+                    <div class="form-group">
+                        <label for="event-name">Event Name *</label>
+                        <input type="text" id="event-name" name="name" required 
+                               placeholder="e.g., Salsa Social at Mango's">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-date">Date *</label>
+                            <input type="date" id="event-date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Time *</label>
+                            <input type="time" id="event-time" name="time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="event-location">Location *</label>
+                        <input type="text" id="event-location" name="location" 
+                               placeholder="Full address with city and state" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maps-link">Google Maps Link *</label>
+                        <input type="url" id="maps-link" name="maps_link" 
+                               placeholder="https://maps.google.com/?q=..." required>
+                        <small class="form-help">Get the link by searching the venue on Google Maps and copying the URL</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dance Type(s) * <small>(Select all that apply)</small></label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="type" value="salsa">
+                                <span class="checkmark"></span>
+                                Salsa
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="type" value="timba">
+                                <span class="checkmark"></span>
+                                Timba
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="type" value="bachata">
+                                <span class="checkmark"></span>
+                                Bachata
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="type" value="merengue">
+                                <span class="checkmark"></span>
+                                Merengue
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="type" value="rueda">
+                                <span class="checkmark"></span>
+                                Rueda de Casino
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="music-type">Music Type</label>
+                            <select id="music-type" name="music">
+                                <option value="">Select type</option>
+                                <option value="Live">Live Band</option>
+                                <option value="DJ">DJ Set</option>
+                                <option value="Mixed">Live + DJ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="text" id="price" name="price" 
+                                   placeholder="e.g., Free, $15, $20-25">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4" 
+                                  placeholder="Additional details about the event, special guests, dress code, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact">Contact Information</label>
+                        <input type="text" id="contact" name="contact" 
+                               placeholder="Phone, email, Instagram handle, or website">
+                    </div>
+                    
+                    <div class="form-group recurring-group">
+                        <label class="checkbox-label recurring-checkbox">
+                            <input type="checkbox" id="recurring" name="recurring">
+                            <span class="checkmark"></span>
+                            This is a recurring event
+                        </label>
+                        <select id="recurring-frequency" name="recurring_frequency" class="recurring-select" style="display: none;">
+                            <option value="weekly">Weekly (every week)</option>
+                            <option value="monthly">Monthly (every month)</option>
+                            <option value="biweekly">Bi-weekly (every 2 weeks)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            <i class="fab fa-github"></i>
+                            Submit Event for Review
+                        </button>
+                        <p class="form-note">
+                            <i class="fas fa-info-circle"></i>
+                            This creates a request for admin review. You'll be notified when it's approved!
+                        </p>
+                    </div>
+                </form>
+                
+                <div class="submission-info">
+                    <h3><i class="fas fa-question-circle"></i> How it works</h3>
+                    <ol>
+                        <li>Fill out the form with your event details</li>
+                        <li>Click submit to create a request</li>
+                        <li>Admins review and approve quality events</li>
+                        <li>Your event appears on the site once approved!</li>
+                    </ol>
+                    <p>
+                        Want to speed up the process? Tag us on Instagram 
+                        <a href="https://instagram.com/cubansocial" target="_blank">@cubansocial</a>,
+                        TikTok <a href="https://tiktok.com/@cubansocial" target="_blank">@cubansocial</a>,
+                        or email <a href="mailto:cubansocial@gmail.com">cubansocial@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Cuban Social</h3>
+                    <p>Connecting the Latin dance community through events, music, and culture.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="#events">Events</a></li>
+                            <li><a href="#congresses">Congresses</a></li>
+                            <li><a href="#playlists">Playlists</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
