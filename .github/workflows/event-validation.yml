@@ -160,5 +160,5 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: '🎉 **New Event Submission!** 🎉\n\nAdmins, please review this event submission using the checklist in the PR template.\n\n📧 **Alternative contact methods:**\n- Instagram: [@cubansocial](https://instagram.com/cubansocial)\n- Email: cubansocial@gmail.com\n\nThank you for contributing to Cuban Social! 🇨🇺💃🕺'
+            body: '🎉 **New Event Submission!** 🎉\n\nAdmins, please review this event submission using the checklist in the PR template.\n\n📧 **Alternative contact methods:**\n- Instagram: [@CubanSocial.SD](https://www.instagram.com/cubansocial.sd/)\n- Email: cubansocial.sd@gmail.com\n\nThank you for contributing to Cuban Social! 🇨🇺💃🕺'
           });

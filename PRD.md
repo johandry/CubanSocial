@@ -57,7 +57,7 @@ Admins will review and approve event submissions through GitHub using the follow
 
 - A message on the form thank-you page will state:
     
-    > “Your event has been submitted as a pull request. Admins are notified via GitHub. If you’d like to speed up the process, feel free to tag or message us on Instagram @cubansocial or email [cubansocial@gmail.com](mailto:cubansocial@gmail.com).”
+    > “Your event has been submitted as a pull request. Admins are notified via GitHub. If you’d like to speed up the process, feel free to tag or message us on Instagram @cubansocial or email [cubansocial.sd@gmail.com](mailto:cubansocial.sd@gmail.com).”
     
 - Optionally, you can add a GitHub webhook or use [GitHub Actions with email notifications](https://github.com/marketplace/actions/send-email) to alert admins.
     

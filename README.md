@@ -45,7 +45,7 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 
 ### For Users
 
-1. Visit [Cuban Social](https://johandry.github.io/CubanSocial)
+1. Visit [Cuban Social](https://CubanSocial.com)
 2. Browse upcoming events or use filters to find specific dance types
 3. Click "Directions" to get Google Maps directions to events
 4. Use "Add to Calendar" to save events to your calendar
@@ -214,11 +214,11 @@ The platform is designed for expansion beyond San Diego:
 ## 📞 Contact & Support
 
 - **Website**: [Cuban Social](https://johandry.github.io/CubanSocial)
-- **Instagram**: [@cubansocial](https://instagram.com/cubansocial)
-- **Facebook**: [@cubansocial](https://facebook.com/cubansocial)
-- **TikTok**: [@cubansocial](https://tiktok.com/@cubansocial)
-- **YouTube**: [@cubansocial](https://youtube.com/cubansocial)
-- **Email**: [cubansocial@gmail.com](mailto:cubansocial@gmail.com)
+- **Instagram**: [@CubanSocial.sd](https://www.instagram.com/cubansocial.sd/.sd)
+- **Facebook**: [@CubanSocial](https://facebook.com/cubansocial)
+- **TikTok**: [@CubanSocial](https://tiktok.com/@cubansocial)
+- **YouTube**: [@CubanSocial](https://www.youtube.com/@CubanSocial)
+- **Email**: [cubansocial.sd@gmail.com](mailto:cubansocial.sd@gmail.com)
 - **GitHub Issues**: For technical problems or feature requests
 
 ## 📄 License
