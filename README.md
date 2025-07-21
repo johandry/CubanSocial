@@ -213,7 +213,7 @@ The platform is designed for expansion beyond San Diego:
 
 ## 📞 Contact & Support
 
-- **Website**: [Cuban Social](https://johandry.github.io/CubanSocial)
+- **Website**: [Cuban Social](https://cubansocial.com)
 - **Instagram**: [@CubanSocial.sd](https://www.instagram.com/cubansocial.sd/.sd)
 - **Facebook**: [@CubanSocial](https://facebook.com/cubansocial)
 - **TikTok**: [@CubanSocial](https://tiktok.com/@cubansocial)

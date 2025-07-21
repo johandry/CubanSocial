@@ -31,7 +31,7 @@
   "bugs": {
     "url": "https://github.com/johandry/CubanSocial/issues"
   },
-  "homepage": "https://johandry.github.io/CubanSocial",
+  "homepage": "https://cubansocial.com",
   "devDependencies": {
     "gh-pages": "^6.0.0",
     "ajv": "^8.12.0",
