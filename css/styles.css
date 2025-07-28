@@ -165,6 +165,13 @@ body {
     margin-bottom: 16px;
     color: var(--text-color);
     padding-right: 100px; /* Space for badges */
+    min-height: 48px; /* Fixed height for 2 lines */
+    line-height: 24px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .event-meta {
@@ -176,15 +183,43 @@ body {
 
 .event-meta-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     color: var(--text-light);
     font-size: 14px;
+    min-height: 24px;
 }
 
 .event-meta-item i {
     width: 16px;
     color: var(--text-color);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+/* Location meta item with fixed height */
+.event-meta-item.location-item {
+    min-height: 60px;
+    align-items: flex-start;
+}
+
+/* Date/time meta item with fixed height for consistency */
+.event-meta-item.date-item {
+    min-height: 48px;
+    align-items: flex-start;
+}
+
+.location-link {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+    line-height: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
 }
 
 .event-price {
@@ -202,11 +237,53 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
-    width: 100%;
+    flex: 1;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
 }
 
 .more-info-btn:hover {
     background-color: #333;
+}
+
+/* Event Actions Container */
+.event-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* Directions Button */
+.directions-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.directions-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.directions-btn i {
+    font-size: 14px;
+}
+
+/* Location Link Hover */
+.location-link:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
 }
 
 /* Filters Section */
@@ -326,6 +403,16 @@ body {
     min-height: 80px;
     position: relative;
     border: none;
+    cursor: default;
+}
+
+.calendar-day.has-event {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-day.has-event:hover {
+    background-color: var(--secondary-color);
 }
 
 .calendar-day.other-month {
@@ -336,13 +423,20 @@ body {
 .calendar-day.has-event::after {
     content: '';
     position: absolute;
-    bottom: 4px;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
+    width: 12px;
+    height: 12px;
     background-color: var(--accent-color);
     border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day.has-event:hover::after {
+    transform: translateX(-50%) scale(1.2);
+    transition: transform 0.2s;
 }
 
 /* Upcoming Events Section */
@@ -363,13 +457,11 @@ body {
 }
 
 .event-badges {
-    position: absolute;
-    top: 16px;
-    right: 16px;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 8px;
-    align-items: flex-end;
+    margin: 16px 0 8px 0;
+    justify-content: flex-start;
 }
 
 .event-type-badge {
@@ -385,6 +477,7 @@ body {
 .event-type-badge.bachata { background: #e0e7ff; color: #3730a3; }
 .event-type-badge.merengue { background: #d1fae5; color: #065f46; }
 .event-type-badge.rueda { background: #fed7d7; color: #c53030; }
+.event-type-badge.cumbia { background: #fef3e2; color: #b45309; }
 
 .load-more-btn {
     background-color: white;
@@ -642,15 +735,18 @@ textarea:focus {
 
 .congress-meta-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     color: var(--text-light);
     font-size: 14px;
+    min-height: 24px;
 }
 
 .congress-meta-item i {
     width: 16px;
     color: var(--accent-color);
+    margin-top: 2px;
+    flex-shrink: 0;
 }
 
 .congress-artists {
@@ -690,6 +786,33 @@ textarea:focus {
 
 .congress-link:hover {
     text-decoration: underline;
+}
+
+/* Congress Actions Container */
+.congress-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.congress-actions .congress-link {
+    flex: 1;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    margin-top: 0;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.congress-actions .congress-link:hover {
+    background-color: #333;
+    text-decoration: none;
+}
+
+.congress-actions .directions-btn {
+    flex: 1;
 }
 
 /* Playlist Styles */

@@ -16,6 +16,7 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 ## 🏗️ Architecture
 
 ### Tech Stack
+
 - **Frontend**: Vanilla HTML, CSS, JavaScript (ES6+)
 - **Hosting**: GitHub Pages (static site)
 - **Data Storage**: JSON files in `/data` directory
@@ -23,7 +24,8 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 - **CI/CD**: GitHub Actions for validation and deployment
 
 ### Directory Structure
-```
+
+```tree
 /
 ├── index.html              # Main application
 ├── css/
@@ -51,6 +53,7 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 4. Use "Add to Calendar" to save events to your calendar
 
 ### For Event Organizers
+
 1. Visit the "Submit Event" section on the website
 2. Fill out the event submission form with complete details
 3. Submit the form to automatically create a GitHub pull request
@@ -58,13 +61,16 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 5. Once approved, your event appears on the live site
 
 ### For Contributors/Developers
+
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/johandry/CubanSocial.git
    cd CubanSocial
    ```
 
 2. Open `index.html` in your browser or serve locally:
+
    ```bash
    # Using Python 3
    python -m http.server 8000
@@ -81,6 +87,7 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 ## 📝 Event Submission Process
 
 ### User Flow
+
 1. **Fill Form**: User completes the event submission form
 2. **Auto PR Creation**: Form generates a GitHub pull request with event data
 3. **Admin Notification**: Admins receive GitHub notifications
@@ -89,6 +96,7 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 6. **Go Live**: Merged PR makes the event visible on the website
 
 ### Event Data Schema
+
 ```json
 {
   "id": "event-001",
@@ -109,7 +117,9 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 ## 🛠️ Admin Guide
 
 ### Review Checklist
+
 When reviewing event submissions, check:
+
 - [ ] Event name is descriptive and relevant
 - [ ] Date and time are valid and in the future  
 - [ ] Location includes full address and valid Google Maps link
@@ -119,12 +129,14 @@ When reviewing event submissions, check:
 - [ ] JSON is properly formatted
 
 ### Approval Process
+
 1. **Review**: Check submission against the checklist
 2. **Move File**: Move from `data/events-pending/` to `data/events/`
 3. **Label**: Add `approved` label to PR
 4. **Merge**: Merge PR to make event live
 
 ### Labels
+
 - `event-submission`: Automatically added to event PRs
 - `pending-review`: Awaiting admin review
 - `approved`: Event approved and ready to merge
@@ -167,6 +179,7 @@ The platform can also feature curated playlists for different dance styles:
 ## 📊 Analytics & Insights
 
 Event organizers and the community can benefit from:
+
 - Event popularity tracking (via GitHub stars/views)
 - Community engagement metrics
 - Geographic distribution of events
@@ -177,6 +190,7 @@ Event organizers and the community can benefit from:
 We welcome contributions! Here's how you can help:
 
 ### Code Contributions
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
@@ -186,11 +200,13 @@ We welcome contributions! Here's how you can help:
 7. Open a pull request
 
 ### Event Contributions
+
 - Use the website form to submit events
 - Share the platform with event organizers
 - Follow us on social media to stay updated
 
 ### Documentation
+
 - Improve this README
 - Add code comments
 - Create user guides
@@ -199,6 +215,7 @@ We welcome contributions! Here's how you can help:
 ## 📱 Mobile App Future
 
 While currently a web application, the architecture supports future mobile app development:
+
 - PWA (Progressive Web App) capabilities
 - React Native/Flutter app using the same data structure
 - Mobile-specific features like push notifications
@@ -206,6 +223,7 @@ While currently a web application, the architecture supports future mobile app d
 ## 🌍 Expansion Plans
 
 The platform is designed for expansion beyond San Diego:
+
 - Multi-city support with city-specific data directories
 - Internationalization (i18n) support
 - Regional admin teams
