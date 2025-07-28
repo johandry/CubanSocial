@@ -10,6 +10,7 @@ class CubanSocialApp {
         this.currentYear = new Date().getFullYear();
         this.displayedEventCount = 6; // Track how many events are currently displayed
         this.eventsPerPage = 6; // How many events to load at a time
+        
         this.init();
     }
 
@@ -29,8 +30,8 @@ class CubanSocialApp {
             this.renderUpcomingEvents();
             console.log('Rendered upcoming events');
             
-            // Initialize with Home section active
-            console.log('About to show Home section');
+            // Initialize with Events section active
+            console.log('About to show Events section');
             this.showSection('home');
             this.setActiveNavLink('home');
             console.log('Initialization complete');
@@ -290,7 +291,7 @@ class CubanSocialApp {
 
         // Show the selected section and render appropriate content
         if (sectionId === 'home' || sectionId === 'events') {
-            console.log('Setting up Home/Events section');
+            console.log('Setting up Events section');
             const homeSection = document.getElementById('home');
             const upcomingSection = document.querySelector('.upcoming-section');
             const filtersSection = document.querySelector('.filters-section');
@@ -298,9 +299,9 @@ class CubanSocialApp {
             
             if (homeSection) {
                 homeSection.style.display = 'block';
-                console.log('Home section display set to block');
+                console.log('Events section display set to block');
             } else {
-                console.error('Home section element not found!');
+                console.error('Events section element not found!');
             }
             
             if (upcomingSection) {
@@ -362,6 +363,36 @@ class CubanSocialApp {
 
         // Form submission
         document.getElementById('event-form')?.addEventListener('submit', (e) => this.handleFormSubmission(e));
+        
+        // Generate Google Maps link from Location
+        const generateMapsBtn = document.getElementById('generate-maps-link');
+        if (generateMapsBtn) {
+            generateMapsBtn.addEventListener('click', () => {
+                const locationField = document.getElementById('event-location');
+                const mapsLinkField = document.getElementById('maps-link');
+                
+                if (locationField && mapsLinkField && locationField.value.trim()) {
+                    const locationQuery = encodeURIComponent(locationField.value.trim());
+                    const mapsUrl = `https://maps.google.com/?q=${locationQuery}`;
+                    mapsLinkField.value = mapsUrl;
+                    
+                    // Open the generated URL in a new tab
+                    window.open(mapsUrl, '_blank');
+                } else if (!locationField.value.trim()) {
+                    alert('Please enter a location first.');
+                }
+            });
+        }
+        
+        // Setup recurring event checkbox
+        const recurringCheckbox = document.getElementById('recurring');
+        const recurringFrequency = document.getElementById('recurring-frequency');
+        
+        if (recurringCheckbox && recurringFrequency) {
+            recurringCheckbox.addEventListener('change', () => {
+                recurringFrequency.style.display = recurringCheckbox.checked ? 'block' : 'none';
+            });
+        }
     }
 
     switchView(view) {
@@ -832,14 +863,62 @@ class CubanSocialApp {
 
     async handleFormSubmission(e) {
         e.preventDefault();
-        
-        const formData = new FormData(e.target);
-        const eventData = this.parseFormData(formData);
+        console.log('Form submission started');
         
         try {
-            await this.createRequest(eventData);
-            this.showSuccessMessage();
-            e.target.reset();
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Validate required fields
+            const requiredFields = ['name', 'date', 'time', 'location', 'maps_link', 'requestor_name', 'requestor_contact'];
+            const missingFields = [];
+            
+            for (const field of requiredFields) {
+                if (!formData.get(field)) {
+                    missingFields.push(field);
+                }
+            }
+            
+            // Additional validation for requestor name and contact
+            const contactInfo = formData.get('requestor_contact');
+            if (contactInfo && contactInfo.trim().length < 5) {
+                this.showError('Please provide a valid contact method (email, phone number, or social media handle)');
+                return;
+            }
+            
+            // Check if contact is an email and if it's valid
+            if (contactInfo.includes('@')) {
+                if (!this.isValidEmail(contactInfo)) {
+                    this.showError('Please provide a valid email address');
+                    return;
+                }
+            }
+            
+            // Check if at least one dance type is selected
+            const danceTypes = formData.getAll('type');
+            if (danceTypes.length === 0) {
+                missingFields.push('dance type');
+            }
+            
+            if (missingFields.length > 0) {
+                this.showError(`Please fill out all required fields: ${missingFields.join(', ')}`);
+                return;
+            }
+            
+            const eventData = this.parseFormData(formData);
+            console.log('Parsed event data:', eventData);
+            
+            // Submit the event and get the response
+            const response = await this.createRequest(eventData);
+            this.showSuccessMessage(response.request_number);
+            form.reset();
+            
+            // Reset the recurring frequency dropdown
+            const recurringFrequency = document.getElementById('recurring-frequency');
+            if (recurringFrequency) {
+                recurringFrequency.style.display = 'none';
+            }
+            
         } catch (error) {
             console.error('Error submitting event:', error);
             this.showError('Failed to submit event. Please try again.');
@@ -849,15 +928,17 @@ class CubanSocialApp {
     parseFormData(formData) {
         const data = {};
         
+        // First, collect all form fields
         for (const [key, value] of formData.entries()) {
             if (key === 'type') {
                 if (!data.type) data.type = [];
                 data.type.push(value);
-            } else {
+            } else if (value.trim() !== '') {  // Skip empty fields
                 data[key] = value;
             }
         }
         
+        // Format date and time fields
         if (data.date && data.time) {
             data.date = `${data.date}T${data.time}:00`;
         }
@@ -866,46 +947,372 @@ class CubanSocialApp {
             data.end_date = `${data.date.split('T')[0]}T${data.end_time}:00`;
         }
         
-        if (formData.has('recurring')) {
+        // Handle boolean checkboxes
+        if (formData.get('recurring') === 'on') {
             data.recurring = data.recurring_frequency || 'weekly';
+            // Clean up the raw checkbox value
+            delete data.recurring_frequency;
         }
         
+        // Handle confirmation email checkbox
+        data.send_confirmation = formData.get('send_confirmation') === 'on';
+        
+        // Add metadata
         data.id = 'event-' + Date.now();
         data.created_at = new Date().toISOString();
+        data.status = 'pending';  // Mark as pending for admin review
         
         return data;
     }
 
     async createRequest(eventData) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('Would create request with:', eventData);
-        return { success: true, request_number: Math.floor(Math.random() * 1000) + 1 };
+        // Real implementation using Formspree
+        console.log('Submitting event request:', eventData);
+        
+        // Create loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-indicator';
+        loadingDiv.style.cssText = `
+            text-align: center;
+            margin: 20px 0;
+        `;
+        loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting your event...';
+        
+        const form = document.getElementById('event-form');
+        if (form) {
+            form.appendChild(loadingDiv);
+        }
+        
+        try {
+            // Format the data for better email readability
+            const formattedData = {
+                ...eventData,
+                // Improve email display with formatted date
+                formatted_date: this.formatEventTime(eventData.date, eventData.recurring, eventData.end_date),
+                // Mark as event submission email
+                _subject: `Cuban Social: New Event Submission - ${eventData.name}`,
+                // Add email confirmation flag for Formspree
+                _cc: eventData.send_confirmation ? eventData.requestor_contact : ''
+            };
+            
+            // Use Formspree to send data to admin email
+            const response = await fetch('https://formspree.io/f/xvgqrqqk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formattedData)
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error('Failed to submit event. ' + (result.error || ''));
+            }
+            
+            // Log the requestor information
+            if (eventData.requestor_name && eventData.requestor_contact) {
+                console.log(`Event submission from: ${eventData.requestor_name} (${eventData.requestor_contact})`);
+            }
+            
+            // Generate request number for confirmation
+            const requestNumber = Math.floor(Math.random() * 1000) + 1;
+            console.log('Event submitted successfully:', requestNumber);
+            
+            // Remove loading indicator
+            loadingDiv.remove();
+            
+            return { 
+                success: true, 
+                request_number: requestNumber,
+                message: result.message || 'Submission received'
+            };
+        } catch (error) {
+            console.error('Submission error:', error);
+            // Remove loading indicator in case of error
+            loadingDiv.remove();
+            throw error;
+        }
     }
 
-    showSuccessMessage() {
-        const message = document.createElement('div');
-        message.className = 'success-message';
-        message.style.cssText = `
-            background-color: #10b981;
+    showSuccessMessage(requestNumber) {
+        const eventForm = document.getElementById('event-form');
+        const requestorName = eventForm ? new FormData(eventForm).get('requestor_name') : '';
+        const greeting = requestorName ? `Thank you, ${requestorName}!` : 'Thank you!';
+        
+        // Hide the form temporarily to show the success page
+        const formContainer = document.querySelector('.submit-section .container');
+        const originalContent = formContainer.innerHTML;
+        
+        // Create a full success page
+        formContainer.innerHTML = `
+            <div class="success-page" style="
+                text-align: center;
+                padding: 40px 20px;
+                max-width: 600px;
+                margin: 0 auto;
+            ">
+                <div class="success-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    background-color: #10b981;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 24px;
+                    animation: successPulse 2s ease-in-out;
+                ">
+                    <i class="fas fa-check" style="
+                        color: white;
+                        font-size: 40px;
+                    "></i>
+                </div>
+                
+                <h2 style="
+                    color: #059669;
+                    margin-bottom: 16px;
+                    font-size: 28px;
+                ">Event Submitted Successfully!</h2>
+                
+                <div class="success-content" style="
+                    background: #f0fdf4;
+                    border: 2px solid #bbf7d0;
+                    border-radius: 12px;
+                    padding: 32px;
+                    margin: 24px 0;
+                    text-align: left;
+                ">
+                    <h3 style="
+                        color: #065f46;
+                        margin-bottom: 16px;
+                        text-align: center;
+                    ">${greeting}</h3>
+                    
+                    <div style="
+                        display: grid;
+                        gap: 12px;
+                        margin-bottom: 20px;
+                    ">
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                        ">
+                            <i class="fas fa-clipboard-check" style="color: #059669; font-size: 18px;"></i>
+                            <span>Your event submission has been received and is under review</span>
+                        </div>
+                        
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                        ">
+                            <i class="fas fa-hashtag" style="color: #059669; font-size: 18px;"></i>
+                            <span>Reference Number: <strong>#${requestNumber}</strong></span>
+                        </div>
+                        
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                        ">
+                            <i class="fas fa-user-check" style="color: #059669; font-size: 18px;"></i>
+                            <span>Our administrators will review your submission within 24-48 hours</span>
+                        </div>
+                        
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                        ">
+                            <i class="fas fa-bell" style="color: #059669; font-size: 18px;"></i>
+                            <span>You'll receive a notification once your event is approved</span>
+                        </div>
+                    </div>
+                    
+                    <div style="
+                        background: #ecfdf5;
+                        border-left: 4px solid #10b981;
+                        padding: 16px;
+                        margin: 20px 0;
+                        border-radius: 4px;
+                    ">
+                        <h4 style="
+                            color: #065f46;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-info-circle"></i>
+                            What happens next?
+                        </h4>
+                        <ol style="
+                            margin: 0;
+                            padding-left: 20px;
+                            color: #064e3b;
+                        ">
+                            <li>Our team reviews your event details for accuracy and completeness</li>
+                            <li>We verify the event information and location</li>
+                            <li>Once approved, your event will be published on the Cuban Social website</li>
+                            <li>You'll receive a confirmation email with the live event link</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div style="
+                    display: flex;
+                    gap: 16px;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    margin-top: 32px;
+                ">
+                    <button onclick="app.returnToForm()" style="
+                        background-color: #3b82f6;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    " onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
+                        <i class="fas fa-plus"></i>
+                        Submit Another Event
+                    </button>
+                    
+                    <button onclick="app.showSection('home'); app.setActiveNavLink('home')" style="
+                        background-color: #6b7280;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    " onmouseover="this.style.backgroundColor='#4b5563'" onmouseout="this.style.backgroundColor='#6b7280'">
+                        <i class="fas fa-home"></i>
+                        Return to Events
+                    </button>
+                </div>
+                
+                <div style="
+                    margin-top: 32px;
+                    padding: 20px;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    text-align: center;
+                ">
+                    <p style="
+                        color: #64748b;
+                        margin: 0 0 12px 0;
+                        font-size: 14px;
+                    ">Questions about your submission?</p>
+                    <div style="
+                        display: flex;
+                        gap: 20px;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                    ">
+                        <a href="mailto:cubansocial.sd@gmail.com" style="
+                            color: #3b82f6;
+                            text-decoration: none;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            font-size: 14px;
+                        ">
+                            <i class="fas fa-envelope"></i>
+                            cubansocial.sd@gmail.com
+                        </a>
+                        <a href="https://www.instagram.com/cubansocial.sd/" target="_blank" style="
+                            color: #3b82f6;
+                            text-decoration: none;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            font-size: 14px;
+                        ">
+                            <i class="fab fa-instagram"></i>
+                            @CubanSocial.SD
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add CSS animation for the success icon
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes successPulse {
+                0% { transform: scale(0); opacity: 0; }
+                50% { transform: scale(1.1); opacity: 1; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Store the original content for restoration
+        formContainer.setAttribute('data-original-content', originalContent);
+        
+        // Scroll to top of the success message
+        formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    returnToForm() {
+        const formContainer = document.querySelector('.submit-section .container');
+        const originalContent = formContainer.getAttribute('data-original-content');
+        
+        if (originalContent) {
+            // Restore the original form content
+            formContainer.innerHTML = originalContent;
+            formContainer.removeAttribute('data-original-content');
+            
+            // Re-setup event listeners for the restored form
+            this.setupEventListeners();
+            
+            // Scroll to the form
+            formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    showError(message) {
+        console.error(message);
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.style.cssText = `
+            background-color: #ef4444;
             color: white;
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 16px;
             text-align: center;
         `;
-        message.innerHTML = `
-            <h4><i class="fas fa-check-circle"></i> Event Submitted Successfully!</h4>
-            <p>Your event has been submitted as a request. Admins will review it shortly.</p>
+        errorDiv.innerHTML = `
+            <h4><i class="fas fa-exclamation-circle"></i> Error</h4>
+            <p>${message}</p>
         `;
         
         const form = document.getElementById('event-form');
-        form.parentNode.insertBefore(message, form);
-        
-        setTimeout(() => message.remove(), 5000);
-    }
-
-    showError(message) {
-        console.error(message);
+        if (form) {
+            // Insert error before the form
+            form.parentNode.insertBefore(errorDiv, form);
+            
+            // Scroll to the error message
+            errorDiv.scrollIntoView({ behavior: 'smooth' });
+            
+            // Remove the error after 5 seconds
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
     }
 
     renderCongresses() {
@@ -947,6 +1354,12 @@ class CubanSocialApp {
         `).join('');
     }
 
+    isValidEmail(email) {
+        // Basic email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
     renderPlaylists() {
         const container = document.getElementById('playlist-grid');
         if (!container) return;

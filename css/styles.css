@@ -286,6 +286,27 @@ body {
     text-decoration: underline;
 }
 
+/* Google Maps Link in Help Text */
+.maps-link {
+    color: var(--accent-color);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    padding: 2px 5px;
+    background-color: rgba(59, 130, 246, 0.1);
+    transition: all 0.2s;
+}
+
+.maps-link:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #1d4ed8;
+    text-decoration: none;
+}
+
+.maps-link i {
+    margin-right: 3px;
+}
+
 /* Filters Section */
 .filters-section {
     background-color: var(--secondary-color);
@@ -915,6 +936,27 @@ textarea:focus {
 
 .submit-btn:hover {
     background-color: #333;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.action-btn:hover {
+    background-color: #1d4ed8;
 }
 
 /* Responsive Design */

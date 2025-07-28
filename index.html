@@ -17,7 +17,7 @@
             <div class="header-content">
                 <h1 class="logo">Cuban Social</h1>
                 <nav class="nav">
-                    <a href="#home" class="nav-link">Home</a>
+                    <a href="#home" class="nav-link">Events</a>
                     <a href="#congresses" class="nav-link">Congresses</a>
                     <a href="#playlists" class="nav-link">Playlists</a>
                     <a href="#submit" class="nav-link">Submit Event</a>
@@ -33,7 +33,7 @@
     </header>
 
     <main>
-        <!-- Home Section -->
+        <!-- Events Section -->
         <section id="home" class="home-section">
             <!-- Filters Section -->
             <div class="filters-section">
@@ -175,9 +175,14 @@
                     
                     <div class="form-group">
                         <label for="maps-link">Google Maps Link *</label>
-                        <input type="url" id="maps-link" name="maps_link" 
-                               placeholder="https://maps.google.com/?q=..." required>
-                        <small class="form-help">Get the link by searching the venue on Google Maps and copying the URL</small>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="url" id="maps-link" name="maps_link" 
+                                   placeholder="https://maps.google.com/?q=..." required style="flex: 1;">
+                            <button type="button" id="generate-maps-link" class="action-btn">
+                                <i class="fas fa-map-marker-alt"></i> Generate
+                            </button>
+                        </div>
+                        <small class="form-help">Get the link by searching the venue on <a href="https://maps.google.com/" target="_blank" class="maps-link"><i class="fas fa-map-marker-alt"></i> Google Maps</a> and copying the URL, or click Generate to create from Location</small>
                     </div>
                     
                     <div class="form-group">
@@ -240,9 +245,33 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="contact">Contact Information</label>
+                        <label for="contact">Event Contact Information</label>
                         <input type="text" id="contact" name="contact" 
-                               placeholder="Phone, email, Instagram handle, or website">
+                               placeholder="Phone, email, Instagram handle, or website for event attendees">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="requestor-name">Your Name *</label>
+                            <input type="text" id="requestor-name" name="requestor_name" required
+                                   placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="requestor-contact">Your Contact Information *</label>
+                            <input type="text" id="requestor-contact" name="requestor_contact" required
+                                   placeholder="Email, phone, or social media handle">
+                        </div>
+                    </div>
+                    <div style="margin-top: -16px; margin-bottom: 16px; width: 100%; text-align: left;">
+                        <small class="form-help">We'll contact you when your event is approved</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="send-confirmation" name="send_confirmation" checked>
+                            <span class="checkmark"></span>
+                            Send me a confirmation email with submission details
+                        </label>
                     </div>
                     
                     <div class="form-group recurring-group">
@@ -260,12 +289,12 @@
                     
                     <div class="form-actions">
                         <button type="submit" class="submit-btn">
-                            <i class="fab fa-github"></i>
+                            <i class="fas fa-paper-plane"></i>
                             Submit Event for Review
                         </button>
                         <p class="form-note">
                             <i class="fas fa-info-circle"></i>
-                            This creates a request for admin review. You'll be notified when it's approved!
+                            Your submission will be reviewed by our team. You'll be notified when your event is approved and published!
                         </p>
                     </div>
                 </form>
@@ -300,7 +329,7 @@
                     <div class="footer-section">
                         <h4>Quick Links</h4>
                         <ul>
-                            <li><a href="#home">Home</a></li>
+                            <li><a href="#home">Events</a></li>
                             <li><a href="#congresses">Congresses</a></li>
                             <li><a href="#playlists">Playlists</a></li>
                         </ul>
