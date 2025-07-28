@@ -1,0 +1,37 @@
+{
+  "id": "mallorca2025",
+  "name": "Cubason Congress 2025",
+  "date": "2025-06-10",
+  "end_date": "2025-10-30",
+  "location": "Palma de Mallorca, Spain",
+  "maps_link": "https://maps.google.com/?q=Palma+de+Mallorca",
+  "description": "A gathering for the soul, where Cuban music beats strongly in the heart of the Mediterranean. Cubason Congress returns to Mallorca with a truly memorable edition. After leaving a lasting impact in New Orleans and Playa del Carmen, we return with more richness, more tradition, and a deep respect for Cuba’s rich musical and dance legacy.",
+  "website": "https://cubasoncongress.com/presale/",
+  "type": [
+    "salsa",
+    "rueda",
+    "timba"
+  ],
+  "featured_artists": [
+    "Adrian Valdivia & Amanda Gil",
+    "Ramses Sariol & Sandra Cuenca",
+    "Miguel Angel Diaz",
+    "Diana Paola Ruiz",
+    "Oliwia Szewczak",
+    "Juan Carlos Pacheco",
+    "Manuel D Gonzalez",
+    "Dc Casineros",
+    "Rigo Iglesias",
+    "Adis Flores",
+    "Ryan & Sidney",
+    "Daniel & Minda",
+    "Cesar & Stephania",
+    "Dj Cokie",
+    "Adriana Cid",
+    "Yuniel Gual",
+    "Alberto Iglesias",
+    "Francesco Iglesias",
+    "Ramiro Diaz"
+  ],
+  "price": "$250 Full Pass"
+}

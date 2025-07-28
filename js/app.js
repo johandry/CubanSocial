@@ -898,9 +898,6 @@ class CubanSocialApp {
                     <a href="${congress.website}" target="_blank" class="congress-link">
                         <i class="fas fa-external-link-alt"></i> More Info & Registration
                     </a>
-                    <a href="${congress.maps_link}" target="_blank" class="directions-btn">
-                        <i class="fas fa-directions"></i> Directions
-                    </a>
                 </div>
             </div>
         `).join('');
