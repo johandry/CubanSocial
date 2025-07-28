@@ -18,7 +18,6 @@ class CubanSocialApp {
         await this.loadCongresses();
         this.setupEventListeners();
         this.setupNavigation();
-        this.renderFeaturedEvents();
         this.renderUpcomingEvents();
         
         // Initialize with Home section active
@@ -275,14 +274,8 @@ class CubanSocialApp {
         });
 
         // Show the selected section and render appropriate content
-        if (sectionId === 'home') {
-            // Home: Show only featured events
-            document.getElementById('home').style.display = 'block';
-            document.querySelector('.upcoming-section').style.display = 'none';
-            document.querySelector('.filters-section').style.display = 'none';
-            document.getElementById('calendar-container').style.display = 'none';
-        } else if (sectionId === 'events') {
-            // Events: Show featured + upcoming events with filters and calendar
+        if (sectionId === 'home' || sectionId === 'events') {
+            // Home & Events: Show upcoming events with filters and calendar
             document.getElementById('home').style.display = 'block';
             document.querySelector('.upcoming-section').style.display = 'block';
             document.querySelector('.filters-section').style.display = 'block';
@@ -319,6 +312,7 @@ class CubanSocialApp {
         document.getElementById('dance-filter')?.addEventListener('change', () => this.applyFilters());
         document.getElementById('music-filter')?.addEventListener('change', () => this.applyFilters());
         document.getElementById('location-filter')?.addEventListener('input', () => this.applyFilters());
+        document.getElementById('featured-filter')?.addEventListener('change', () => this.applyFilters());
 
         // Load more button
         document.getElementById('load-more')?.addEventListener('click', () => this.loadMoreEvents());
@@ -529,13 +523,15 @@ class CubanSocialApp {
         const danceFilter = document.getElementById('dance-filter')?.value || '';
         const musicFilter = document.getElementById('music-filter')?.value || '';
         const locationFilter = document.getElementById('location-filter')?.value.toLowerCase() || '';
+        const featuredFilter = document.getElementById('featured-filter')?.value || '';
 
         this.filteredEvents = this.events.filter(event => {
             const matchesDance = !danceFilter || event.type.includes(danceFilter);
             const matchesMusic = !musicFilter || event.music === musicFilter;
             const matchesLocation = !locationFilter || event.location.toLowerCase().includes(locationFilter);
+            const matchesFeatured = !featuredFilter || (featuredFilter === 'true' && (event.featured || event.recurring));
             
-            return matchesDance && matchesMusic && matchesLocation;
+            return matchesDance && matchesMusic && matchesLocation && matchesFeatured;
         });
 
         // Reset displayed count when filters change

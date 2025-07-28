@@ -17,7 +17,6 @@
                 <h1 class="logo">Cuban Social</h1>
                 <nav class="nav">
                     <a href="#home" class="nav-link">Home</a>
-                    <a href="#events" class="nav-link">Events</a>
                     <a href="#congresses" class="nav-link">Congresses</a>
                     <a href="#playlists" class="nav-link">Playlists</a>
                     <a href="#submit" class="nav-link">Submit Event</a>
@@ -35,21 +34,6 @@
     <main>
         <!-- Home Section -->
         <section id="home" class="home-section">
-            <!-- Featured Events Section -->
-            <div class="featured-section">
-                <div class="container">
-                    <div class="section-header">
-                        <h2>Featured Events</h2>
-                        <div class="pinned-indicator">
-                            <i class="fas fa-star"></i> Pinned
-                        </div>
-                    </div>
-                    <div id="featured-events" class="featured-events-grid">
-                        <!-- Featured events will be loaded here via JavaScript -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Filters Section -->
             <div class="filters-section">
                 <div class="container">
@@ -78,6 +62,13 @@
                         <div class="filter-group">
                             <label for="location-filter">Location:</label>
                             <input type="text" id="location-filter" class="filter-input" placeholder="Enter city...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="featured-filter">Featured:</label>
+                            <select id="featured-filter" class="filter-select">
+                                <option value="">All</option>
+                                <option value="true">Featured Only</option>
+                            </select>
                         </div>
                         <div class="view-toggle">
                             <button id="calendar-view" class="view-btn">
@@ -316,7 +307,7 @@
                     <div class="footer-section">
                         <h4>Quick Links</h4>
                         <ul>
-                            <li><a href="#events">Events</a></li>
+                            <li><a href="#home">Home</a></li>
                             <li><a href="#congresses">Congresses</a></li>
                             <li><a href="#playlists">Playlists</a></li>
                         </ul>
