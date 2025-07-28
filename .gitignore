@@ -1,0 +1,19 @@
+# macOS system files
+.DS_Store
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build output
+dist/
+build/

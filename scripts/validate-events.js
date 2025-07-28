@@ -17,7 +17,7 @@ function validateEvents() {
     
     // Validate approved events
     if (fs.existsSync(eventsDir)) {
-        const approvedFiles = fs.readdirSync(eventsDir).filter(file => file.endsWith('.json'));
+        const approvedFiles = fs.readdirSync(eventsDir).filter(file => file.endsWith('.json') && file !== 'index.json');
         console.log(`📅 Validating ${approvedFiles.length} approved events...`);
         
         for (const file of approvedFiles) {
@@ -31,7 +31,7 @@ function validateEvents() {
     
     // Validate pending events
     if (fs.existsSync(eventsPendingDir)) {
-        const pendingFiles = fs.readdirSync(eventsPendingDir).filter(file => file.endsWith('.json'));
+        const pendingFiles = fs.readdirSync(eventsPendingDir).filter(file => file.endsWith('.json') && file !== 'index.json');
         console.log(`⏳ Validating ${pendingFiles.length} pending events...`);
         
         for (const file of pendingFiles) {
@@ -105,7 +105,7 @@ function validateEventFile(filePath, status = 'unknown') {
         }
         
         // Validate dance types
-        const validTypes = ['salsa', 'timba', 'bachata', 'merengue', 'rueda'];
+        const validTypes = ['salsa', 'timba', 'bachata', 'merengue', 'rueda', 'cumbia'];
         if (event.type && Array.isArray(event.type)) {
             for (const type of event.type) {
                 if (!validTypes.includes(type)) {
