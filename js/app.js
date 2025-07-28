@@ -14,15 +14,29 @@ class CubanSocialApp {
     }
 
     async init() {
-        await this.loadEvents();
-        await this.loadCongresses();
-        this.setupEventListeners();
-        this.setupNavigation();
-        this.renderUpcomingEvents();
-        
-        // Initialize with Home section active
-        this.showSection('home');
-        this.setActiveNavLink('home');
+        console.log('App initialization started');
+        try {
+            await this.loadEvents();
+            console.log(`Loaded ${this.events.length} events`);
+            
+            await this.loadCongresses();
+            console.log(`Loaded ${this.congresses.length} congresses`);
+            
+            this.setupEventListeners();
+            this.setupNavigation();
+            
+            console.log('About to render upcoming events');
+            this.renderUpcomingEvents();
+            console.log('Rendered upcoming events');
+            
+            // Initialize with Home section active
+            console.log('About to show Home section');
+            this.showSection('home');
+            this.setActiveNavLink('home');
+            console.log('Initialization complete');
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
     }
 
     async loadEvents() {
@@ -268,6 +282,7 @@ class CubanSocialApp {
     }
 
     showSection(sectionId) {
+        console.log(`Showing section: ${sectionId}`);
         // Hide all sections
         document.querySelectorAll('.section, .home-section').forEach(section => {
             section.style.display = 'none';
@@ -275,11 +290,39 @@ class CubanSocialApp {
 
         // Show the selected section and render appropriate content
         if (sectionId === 'home' || sectionId === 'events') {
-            // Home & Events: Show upcoming events with filters and calendar
-            document.getElementById('home').style.display = 'block';
-            document.querySelector('.upcoming-section').style.display = 'block';
-            document.querySelector('.filters-section').style.display = 'block';
-            document.getElementById('calendar-container').style.display = this.currentView === 'calendar' ? 'block' : 'none';
+            console.log('Setting up Home/Events section');
+            const homeSection = document.getElementById('home');
+            const upcomingSection = document.querySelector('.upcoming-section');
+            const filtersSection = document.querySelector('.filters-section');
+            const calendarContainer = document.getElementById('calendar-container');
+            
+            if (homeSection) {
+                homeSection.style.display = 'block';
+                console.log('Home section display set to block');
+            } else {
+                console.error('Home section element not found!');
+            }
+            
+            if (upcomingSection) {
+                upcomingSection.style.display = 'block';
+                console.log('Upcoming section display set to block');
+            } else {
+                console.error('Upcoming section element not found!');
+            }
+            
+            if (filtersSection) {
+                filtersSection.style.display = 'block';
+                console.log('Filters section display set to block');
+            } else {
+                console.error('Filters section element not found!');
+            }
+            
+            if (calendarContainer) {
+                calendarContainer.style.display = this.currentView === 'calendar' ? 'block' : 'none';
+                console.log(`Calendar container display set to ${this.currentView === 'calendar' ? 'block' : 'none'}`);
+            } else {
+                console.error('Calendar container element not found!');
+            }
         } else {
             // Other sections: Show specific section only
             const targetSection = document.getElementById(sectionId);
@@ -392,10 +435,15 @@ class CubanSocialApp {
     }
 
     renderUpcomingEvents() {
+        console.log('renderUpcomingEvents called');
         const container = document.getElementById('events-list');
-        if (!container) return;
+        if (!container) {
+            console.error('Events list container not found!');
+            return;
+        }
 
         const upcomingEvents = this.filteredEvents.slice(0, this.displayedEventCount);
+        console.log(`Rendering ${upcomingEvents.length} upcoming events out of ${this.filteredEvents.length} filtered events`);
         
         container.innerHTML = upcomingEvents.map(event => `
             <div class="featured-event-card">

@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    <meta name="version" content="1.1.0"> <!-- Update version to force refresh -->
     <title>Cuban Social - Dance Events near San Diego</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -112,15 +116,7 @@
             </div>
         </section>
 
-        <!-- Other Sections (Events, Congresses, Playlists) -->
-        <section id="events" class="section" style="display: none;">
-            <div class="container">
-                <h2>All Events</h2>
-                <div class="events-grid" id="all-events-grid">
-                    <!-- All events will be loaded here -->
-                </div>
-            </div>
-        </section>
+        <!-- Other Sections (Congresses, Playlists) -->
 
         <section id="congresses" class="section" style="display: none;">
             <div class="container">
@@ -314,6 +310,22 @@
         </div>
     </footer>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=1.1.0"></script>
+    <script>
+        // Force reload if the page seems unresponsive after loading
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                // Check if events have been loaded properly
+                var eventsList = document.getElementById('events-list');
+                if (eventsList && eventsList.children.length === 0) {
+                    console.log("No events loaded after timeout - may need to refresh");
+                    // If no events are displayed after 3 seconds, try reloading
+                    if (confirm('No events seem to be loading. Would you like to refresh the page?')) {
+                        window.location.reload(true);
+                    }
+                }
+            }, 3000);
+        });
+    </script>
 </body>
 </html>
