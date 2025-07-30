@@ -1,0 +1,19 @@
+{
+  "id": "event-250906",
+  "name": "Havana Nights",
+  "date": "2025-09-06T17:00:00",
+  "location": "27309 Jefferson Ave. A -101, Temecula, Ca. 92590",
+  "maps_link": "https://maps.google.com/?q=27309%20Jefferson%20Ave.%20A%20-101%2C%20Temecula%2C%20Ca.%2092590",
+  "type": [
+    "timba",
+    "rueda"
+  ],
+  "music": "DJ",
+  "price": "$25",
+  "description": "Immerse yourself in the essence of Cuba at Havana Nights, a captivating all Cuban event filled with the spirit of the Caribbean.",
+  "contact": "@951-421-8777",
+  "featured": false,
+  "created_at": "2025-07-29T22:42:04.183Z",
+  "end_date": "2025-09-06T23:59:00",
+  "status": "pending"
+}
