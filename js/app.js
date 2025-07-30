@@ -14,14 +14,34 @@ class CubanSocialApp {
         this.init();
     }
 
+    // Analytics helper function
+    trackEvent(eventName, parameters = {}) {
+        // Google Analytics 4 tracking
+        if (typeof gtag !== 'undefined') {
+            gtag('event', eventName, {
+                event_category: 'Cuban Social',
+                event_label: parameters.label || '',
+                value: parameters.value || 0,
+                ...parameters
+            });
+        }
+        
+        // Console log for debugging
+        console.log(`Analytics: ${eventName}`, parameters);
+    }
+
     async init() {
         console.log('App initialization started');
+        this.trackEvent('app_initialized', { timestamp: new Date().toISOString() });
+        
         try {
             await this.loadEvents();
             console.log(`Loaded ${this.events.length} events`);
+            this.trackEvent('events_loaded', { count: this.events.length });
             
             await this.loadCongresses();
             console.log(`Loaded ${this.congresses.length} congresses`);
+            this.trackEvent('congresses_loaded', { count: this.congresses.length });
             
             this.setupEventListeners();
             this.setupNavigation();
@@ -265,8 +285,24 @@ class CubanSocialApp {
                 const targetSection = e.target.getAttribute('href').substring(1);
                 this.showSection(targetSection);
                 this.setActiveNavLink(targetSection);
+                
+                // Track navigation
+                this.trackEvent('page_view', {
+                    page_title: this.getSectionTitle(targetSection),
+                    page_location: `${window.location.origin}/#${targetSection}`
+                });
             });
         });
+    }
+
+    getSectionTitle(sectionId) {
+        const titles = {
+            'home': 'Events',
+            'congresses': 'Congresses', 
+            'playlists': 'Playlists',
+            'submit': 'Submit Event'
+        };
+        return titles[sectionId] || sectionId;
     }
 
     setActiveNavLink(sectionId) {
@@ -353,10 +389,34 @@ class CubanSocialApp {
         document.getElementById('next-month')?.addEventListener('click', () => this.nextMonth());
 
         // Filters
-        document.getElementById('dance-filter')?.addEventListener('change', () => this.applyFilters());
-        document.getElementById('music-filter')?.addEventListener('change', () => this.applyFilters());
-        document.getElementById('location-filter')?.addEventListener('input', () => this.applyFilters());
-        document.getElementById('featured-filter')?.addEventListener('change', () => this.applyFilters());
+        document.getElementById('dance-filter')?.addEventListener('change', (e) => {
+            this.trackEvent('filter_used', {
+                filter_type: 'dance',
+                filter_value: e.target.value
+            });
+            this.applyFilters();
+        });
+        document.getElementById('music-filter')?.addEventListener('change', (e) => {
+            this.trackEvent('filter_used', {
+                filter_type: 'music',
+                filter_value: e.target.value
+            });
+            this.applyFilters();
+        });
+        document.getElementById('location-filter')?.addEventListener('input', (e) => {
+            this.trackEvent('filter_used', {
+                filter_type: 'location',
+                filter_value: e.target.value ? 'text_entered' : 'cleared'
+            });
+            this.applyFilters();
+        });
+        document.getElementById('featured-filter')?.addEventListener('change', (e) => {
+            this.trackEvent('filter_used', {
+                filter_type: 'featured',
+                filter_value: e.target.checked ? 'enabled' : 'disabled'
+            });
+            this.applyFilters();
+        });
 
         // Load more button
         document.getElementById('load-more')?.addEventListener('click', () => this.loadMoreEvents());
@@ -393,6 +453,47 @@ class CubanSocialApp {
                 recurringFrequency.style.display = recurringCheckbox.checked ? 'block' : 'none';
             });
         }
+        
+        // Track external link clicks
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && link.href) {
+                const url = link.href;
+                
+                // Track external links
+                if (url.startsWith('http') && !url.includes(window.location.hostname)) {
+                    this.trackEvent('external_link_clicked', {
+                        link_url: url,
+                        link_text: link.textContent || 'No text',
+                        link_type: this.getLinkType(url)
+                    });
+                }
+                
+                // Track specific internal actions
+                if (url.includes('mailto:')) {
+                    this.trackEvent('contact_clicked', {
+                        contact_type: 'email',
+                        contact_value: url.replace('mailto:', '')
+                    });
+                }
+                
+                if (url.includes('maps.google.com') || url.includes('maps.app.goo.gl')) {
+                    this.trackEvent('maps_link_clicked', {
+                        link_url: url
+                    });
+                }
+            }
+        });
+    }
+    
+    getLinkType(url) {
+        if (url.includes('instagram.com')) return 'instagram';
+        if (url.includes('facebook.com')) return 'facebook';
+        if (url.includes('spotify.com')) return 'spotify';
+        if (url.includes('youtube.com')) return 'youtube';
+        if (url.includes('maps.google.com') || url.includes('maps.app.goo.gl')) return 'maps';
+        if (url.includes('mailto:')) return 'email';
+        return 'other';
     }
 
     switchView(view) {
@@ -910,6 +1011,15 @@ class CubanSocialApp {
             
             // Submit the event and get the response
             const response = await this.createRequest(eventData);
+            
+            // Track successful event submission
+            this.trackEvent('event_submitted', {
+                event_name: eventData.name || 'Unknown Event',
+                event_date: eventData.date || 'Unknown Date',
+                event_type: Array.isArray(eventData.type) ? eventData.type.join(', ') : eventData.type || 'Unknown Type',
+                request_number: response.request_number
+            });
+            
             this.showSuccessMessage(response.request_number);
             form.reset();
             

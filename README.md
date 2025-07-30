@@ -84,7 +84,23 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 
 3. Make your changes and submit a pull request
 
-## 📝 Event Submission Process
+## � Analytics Setup
+
+Cuban Social includes comprehensive analytics tracking to monitor website usage and user engagement. See `analytics-setup.md` for complete configuration instructions.
+
+### Quick Setup
+
+1. **Privacy-Friendly Alternative**: Consider Plausible or Simple Analytics for GDPR compliance
+
+### Tracked Events
+
+- Page navigation and user flows
+- Event submissions and success rates
+- Filter usage patterns
+- External link interactions
+- Contact engagement
+
+## �📝 Event Submission Process
 
 ### User Flow
 
