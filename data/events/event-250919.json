@@ -1,0 +1,21 @@
+{
+  "id": "event-250919",
+  "name": "Havana Nights at Studio K",
+  "date": "2025-09-19T19:00:00",
+  "location": "9330 Clairemont Mesa Blvd Suite C San Diego, CA 92123",
+  "maps_link": "https://maps.app.goo.gl/1CV1iJFPNAgihYn38?g_st=ipc",
+  "type": [
+    "salsa",
+    "timba",
+    "bachata",
+    "merengue",
+    "rueda"
+  ],
+  "music": "DJ",
+  "price": "$20",
+  "description": "Havana nights at Studio K social with light snacks and drinks and DJ",
+  "contact": "@8583442343",
+  "featured": false,
+  "created_at": "2025-08-02T13:07:50.153Z",
+  "status": "pending"
+}
