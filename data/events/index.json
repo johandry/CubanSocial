@@ -1,6 +1,7 @@
 {
   "files": [
     "event-250802.json",
+    "event-250808.json",
     "event-250809.json",
     "event-250816.json",
     "event-250817.json",
@@ -10,5 +11,5 @@
     "event-250919.json",
     "event-250920.json"
   ],
-  "last_updated": "2025-08-02T23:28:58.778Z"
+  "last_updated": "2025-08-03T03:54:44.580Z"
 }

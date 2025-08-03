@@ -193,7 +193,7 @@ function parseCSVToEvent(csvContent) {
     // Return fields in the specified order
     const orderedEvent = {};
     const fieldOrder = [
-        'id', 'name', 'date', 'location', 'maps_link', 'type', 
+        'id', 'name', 'date', 'end_date', 'location', 'maps_link', 'type', 
         'music', 'price', 'description', 'contact', 'featured', 'created_at'
     ];
     
