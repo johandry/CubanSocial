@@ -50,8 +50,12 @@ class CubanSocialApp {
             this.renderUpcomingEvents();
             console.log('Rendered upcoming events');
             
-            // Initialize with Events section active
-            console.log('About to show Events section');
+            // Load monthly cards for carousel
+            await this.loadMonthlyCards();
+            this.setupCarousel();
+            
+            // Initialize with Home (Events) section active
+            console.log('About to show Home section');
             this.showSection('home');
             this.setActiveNavLink('home');
             console.log('Initialization complete');
@@ -293,10 +297,27 @@ class CubanSocialApp {
                 });
             });
         });
+        
+        // Logo navigation to landing page
+        const logoLink = document.querySelector('.logo-link');
+        if (logoLink) {
+            logoLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showSection('landing');
+                this.setActiveNavLink('landing');
+                
+                // Track logo click
+                this.trackEvent('logo_click', {
+                    page_title: 'Landing Page',
+                    page_location: `${window.location.origin}/#landing`
+                });
+            });
+        }
     }
 
     getSectionTitle(sectionId) {
         const titles = {
+            'landing': 'Cuban Social - Home',
             'home': 'Events',
             'congresses': 'Congresses', 
             'playlists': 'Playlists',
@@ -321,12 +342,19 @@ class CubanSocialApp {
     showSection(sectionId) {
         console.log(`Showing section: ${sectionId}`);
         // Hide all sections
-        document.querySelectorAll('.section, .home-section').forEach(section => {
+        document.querySelectorAll('.section, .home-section, .landing-section').forEach(section => {
             section.style.display = 'none';
         });
 
         // Show the selected section and render appropriate content
-        if (sectionId === 'home' || sectionId === 'events') {
+        if (sectionId === 'landing') {
+            console.log('Setting up Landing section');
+            const landingSection = document.getElementById('landing');
+            if (landingSection) {
+                landingSection.style.display = 'block';
+                console.log('Landing section display set to block');
+            }
+        } else if (sectionId === 'home' || sectionId === 'events') {
             console.log('Setting up Events section');
             const homeSection = document.getElementById('home');
             const upcomingSection = document.querySelector('.upcoming-section');
@@ -420,6 +448,22 @@ class CubanSocialApp {
 
         // Load more button
         document.getElementById('load-more')?.addEventListener('click', () => this.loadMoreEvents());
+        
+        // Landing page CTA buttons
+        document.querySelectorAll('.cta-primary, .cta-secondary').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = e.target.getAttribute('href').substring(1);
+                this.showSection(targetSection);
+                this.setActiveNavLink(targetSection);
+                
+                // Track CTA click
+                this.trackEvent('cta_click', {
+                    button_type: e.target.classList.contains('cta-primary') ? 'primary' : 'secondary',
+                    target_section: targetSection
+                });
+            });
+        });
 
         // Form submission
         document.getElementById('event-form')?.addEventListener('submit', (e) => this.handleFormSubmission(e));
@@ -1527,6 +1571,145 @@ class CubanSocialApp {
                 </div>
             </div>
         `).join('');
+    }
+
+    async loadMonthlyCards() {
+        try {
+            // Generate list of available card files based on current date
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // 1-based month
+            const currentYear = currentDate.getFullYear();
+            
+            this.monthlyCards = [];
+            
+            // Start from current month and add next few months
+            for (let i = 0; i < 6; i++) {
+                const month = ((currentMonth - 1 + i) % 12) + 1;
+                const year = currentYear + Math.floor((currentMonth - 1 + i) / 12);
+                const filename = `events-${year}-${month.toString().padStart(2, '0')}.png`;
+                const cardPath = `data/cards/${filename}`;
+                
+                // Check if file exists by attempting to load it
+                try {
+                    const response = await fetch(cardPath, { method: 'HEAD' });
+                    if (response.ok) {
+                        const monthNames = [
+                            'January', 'February', 'March', 'April', 'May', 'June',
+                            'July', 'August', 'September', 'October', 'November', 'December'
+                        ];
+                        
+                        this.monthlyCards.push({
+                            path: cardPath,
+                            month: monthNames[month - 1],
+                            year: year,
+                            filename: filename
+                        });
+                    }
+                } catch (error) {
+                    console.log(`Card not found: ${filename}`);
+                }
+            }
+            
+            console.log(`Loaded ${this.monthlyCards.length} monthly cards`);
+        } catch (error) {
+            console.error('Error loading monthly cards:', error);
+            this.monthlyCards = [];
+        }
+    }
+
+    setupCarousel() {
+        const track = document.getElementById('carousel-track');
+        const indicators = document.getElementById('carousel-indicators');
+        const prevBtn = document.getElementById('carousel-prev');
+        const nextBtn = document.getElementById('carousel-next');
+        
+        if (!track || this.monthlyCards.length === 0) {
+            console.log('No carousel track found or no cards to display');
+            return;
+        }
+        
+        this.currentSlide = 0;
+        
+        // Populate carousel with cards
+        track.innerHTML = this.monthlyCards.map(card => `
+            <div class="carousel-slide">
+                <img src="${card.path}" 
+                     alt="${card.month} ${card.year} Events" 
+                     onclick="app.downloadCard('${card.path}', '${card.filename}')"
+                     title="Click to download ${card.month} ${card.year} events card">
+            </div>
+        `).join('');
+        
+        // Populate indicators
+        indicators.innerHTML = this.monthlyCards.map((_, index) => `
+            <div class="indicator ${index === 0 ? 'active' : ''}" 
+                 onclick="app.goToSlide(${index})"></div>
+        `).join('');
+        
+        // Setup navigation buttons
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.previousSlide());
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextSlide());
+        }
+        
+        // Auto-play carousel
+        this.startAutoPlay();
+    }
+
+    goToSlide(index) {
+        if (index < 0 || index >= this.monthlyCards.length) return;
+        
+        this.currentSlide = index;
+        const track = document.getElementById('carousel-track');
+        const indicators = document.querySelectorAll('.indicator');
+        
+        if (track) {
+            track.style.transform = `translateX(-${index * 100}%)`;
+        }
+        
+        // Update indicators
+        indicators.forEach((indicator, i) => {
+            indicator.classList.toggle('active', i === index);
+        });
+    }
+
+    nextSlide() {
+        const nextIndex = (this.currentSlide + 1) % this.monthlyCards.length;
+        this.goToSlide(nextIndex);
+    }
+
+    previousSlide() {
+        const prevIndex = (this.currentSlide - 1 + this.monthlyCards.length) % this.monthlyCards.length;
+        this.goToSlide(prevIndex);
+    }
+
+    startAutoPlay() {
+        // Auto-advance every 8 seconds
+        setInterval(() => {
+            if (this.monthlyCards.length > 1) {
+                this.nextSlide();
+            }
+        }, 8000);
+    }
+
+    downloadCard(cardPath, filename) {
+        // Track download event
+        this.trackEvent('card_download', {
+            card_name: filename,
+            download_method: 'click'
+        });
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = cardPath;
+        link.download = filename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 
