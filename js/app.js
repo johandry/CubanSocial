@@ -5,6 +5,7 @@ class CubanSocialApp {
         this.events = [];
         this.filteredEvents = [];
         this.congresses = [];
+        this.playlists = [];
         this.currentView = 'list';
         this.currentMonth = new Date().getMonth();
         this.currentYear = new Date().getFullYear();
@@ -42,6 +43,10 @@ class CubanSocialApp {
             await this.loadCongresses();
             console.log(`Loaded ${this.congresses.length} congresses`);
             this.trackEvent('congresses_loaded', { count: this.congresses.length });
+            
+            await this.loadPlaylists();
+            console.log(`Loaded ${this.playlists.length} playlists`);
+            this.trackEvent('playlists_loaded', { count: this.playlists.length });
             
             this.setupEventListeners();
             this.setupNavigation();
@@ -277,6 +282,87 @@ class CubanSocialApp {
                 type: ["bachata"],
                 featured_artists: ["Daniel & Desiree", "Corky & Judith"],
                 price: "$249 Weekend Pass"
+            }
+        ];
+    }
+
+    async loadPlaylists() {
+        try {
+            this.playlists = await this.loadPlaylistsFromDirectory();
+        } catch (error) {
+            console.error('Error loading playlists:', error);
+            // Fallback to sample playlists if loading from files fails
+            this.playlists = await this.loadSamplePlaylists();
+            this.showError('Using sample playlists. Playlist files may not be available.');
+        }
+    }
+
+    async loadPlaylistsFromDirectory() {
+        const playlists = [];
+        
+        try {
+            const indexResponse = await fetch('data/playlists/index.json');
+            if (indexResponse.ok) {
+                const index = await indexResponse.json();
+                for (const filename of index.playlists) {
+                    try {
+                        const response = await fetch(`data/playlists/${filename}`);
+                        if (response.ok) {
+                            const playlist = await response.json();
+                            playlists.push(playlist);
+                        } else {
+                            console.warn(`Could not load ${filename}: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.warn(`Error loading playlist ${filename}:`, error);
+                    }
+                }
+            } else {
+                // If no index.json, try to load individual files
+                const knownFiles = ['timba2025.json'];
+                for (const filename of knownFiles) {
+                    try {
+                        const response = await fetch(`data/playlists/${filename}`);
+                        if (response.ok) {
+                            const playlist = await response.json();
+                            playlists.push(playlist);
+                        } else {
+                            console.warn(`Could not load ${filename}: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.warn(`Error loading playlist ${filename}:`, error);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error accessing playlists directory:', error);
+            throw error;
+        }
+        
+        return playlists;
+    }
+
+    async loadSamplePlaylists() {
+        return [
+            {
+                id: "cuban-salsa",
+                name: "Best of Cuban Salsa",
+                description: "Classic salsa tracks from the masters of Cuban music",
+                track_count: 45,
+                duration: "3h 24min",
+                playlist_url: "https://open.spotify.com/playlist/cuban-salsa-example",
+                tags: ["salsa", "cuban", "classic"],
+                featured: true
+            },
+            {
+                id: "timba-hits",
+                name: "Timba Hits 2025",
+                description: "Latest timba tracks that are setting dance floors on fire",
+                track_count: 32,
+                duration: "2h 18min",
+                playlist_url: "https://music.youtube.com/playlist?list=timba-hits-example",
+                tags: ["timba", "modern", "high-energy"],
+                featured: true
             }
         ];
     }
@@ -1518,59 +1604,73 @@ class CubanSocialApp {
         const container = document.getElementById('playlist-grid');
         if (!container) return;
 
-        const playlistData = [
-            {
-                name: "Best of Cuban Salsa",
-                description: "Classic salsa tracks from the masters of Cuban music",
-                trackCount: 45,
-                duration: "3h 24min",
-                spotify: "https://open.spotify.com/playlist/cuban-salsa",
-                cover: "🎵"
-            },
-            {
-                name: "Timba Hits 2025",
-                description: "Latest timba tracks that are setting dance floors on fire",
-                trackCount: 32,
-                duration: "2h 18min",
-                spotify: "https://open.spotify.com/playlist/timba-2025",
-                cover: "🔥"
-            },
-            {
-                name: "Bachata Romántica",
-                description: "Smooth bachata for those romantic dance moments",
-                trackCount: 28,
-                duration: "2h 5min",
-                spotify: "https://open.spotify.com/playlist/bachata-romantica",
-                cover: "💕"
-            },
-            {
-                name: "Rueda de Casino Mix",
-                description: "Perfect tracks for rueda de casino sessions",
-                trackCount: 38,
-                duration: "2h 55min",
-                spotify: "https://open.spotify.com/playlist/rueda-casino",
-                cover: "💃"
-            }
-        ];
+        if (this.playlists.length === 0) {
+            container.innerHTML = '<p>No playlists available.</p>';
+            return;
+        }
 
-        container.innerHTML = playlistData.map(playlist => `
-            <div class="playlist-card">
-                <div class="playlist-cover">
-                    <span class="playlist-emoji">${playlist.cover}</span>
-                </div>
-                <div class="playlist-info">
-                    <h3>${playlist.name}</h3>
-                    <p>${playlist.description}</p>
-                    <div class="playlist-stats">
-                        <span><i class="fas fa-music"></i> ${playlist.trackCount} tracks</span>
-                        <span><i class="fas fa-clock"></i> ${playlist.duration}</span>
+        container.innerHTML = this.playlists.map(playlist => {
+            // Use provided track count and duration, or defaults
+            const trackCount = playlist.track_count || 0;
+            const duration = playlist.duration || 'Unknown';
+            
+            // Get emoji based on tags or use default
+            let cover = '🎵';
+            if (playlist.tags) {
+                if (playlist.tags.includes('timba')) cover = '🔥';
+                else if (playlist.tags.includes('bachata')) cover = '💕';
+                else if (playlist.tags.includes('rueda')) cover = '💃';
+                else if (playlist.tags.includes('salsa')) cover = '🎵';
+            }
+
+            // Detect platform from URL and set appropriate icon and label
+            let platformIcon = 'fas fa-music';
+            let platformName = 'Listen';
+            
+            if (playlist.playlist_url) {
+                if (playlist.playlist_url.includes('spotify.com')) {
+                    platformIcon = 'fab fa-spotify';
+                    platformName = 'Spotify';
+                } else if (playlist.playlist_url.includes('music.youtube.com') || playlist.playlist_url.includes('youtube.com')) {
+                    platformIcon = 'fab fa-youtube';
+                    platformName = 'YouTube Music';
+                } else if (playlist.playlist_url.includes('music.apple.com')) {
+                    platformIcon = 'fab fa-apple';
+                    platformName = 'Apple Music';
+                } else if (playlist.playlist_url.includes('amazon.com') || playlist.playlist_url.includes('music.amazon')) {
+                    platformIcon = 'fab fa-amazon';
+                    platformName = 'Amazon Music';
+                } else if (playlist.playlist_url.includes('deezer.com')) {
+                    platformIcon = 'fas fa-music';
+                    platformName = 'Deezer';
+                } else if (playlist.playlist_url.includes('tidal.com')) {
+                    platformIcon = 'fas fa-music';
+                    platformName = 'Tidal';
+                }
+            }
+
+            return `
+                <div class="playlist-card">
+                    <div class="playlist-cover">
+                        <span class="playlist-emoji">${cover}</span>
                     </div>
-                    <a href="${playlist.spotify}" target="_blank" class="playlist-link">
-                        <i class="fab fa-spotify"></i> Listen on Spotify
-                    </a>
+                    <div class="playlist-info">
+                        <h3>${playlist.name}</h3>
+                        <div class="event-badges">
+                            ${playlist.tags.map(tag => `<div class="event-type-badge ${tag}">${tag}</div>`).join('')}
+                        </div>
+                        <p>${playlist.description}</p>
+                        <div class="playlist-stats">
+                            <span><i class="fas fa-music"></i> ${trackCount} tracks</span>
+                            <span><i class="fas fa-clock"></i> ${duration}</span>
+                        </div>
+                        ${playlist.playlist_url ? `<a href="${playlist.playlist_url}" target="_blank" class="playlist-link">
+                            <i class="${platformIcon}"></i> Listen on ${platformName}
+                        </a>` : ''}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     async loadMonthlyCards() {
