@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { generateEventCards } = require('./generate-event-cards');
 
 function generateOutputFilename(eventData) {
     if (!eventData.id) {
@@ -214,7 +215,7 @@ function parseCSVToEvent(csvContent) {
     return orderedEvent;
 }
 
-function main() {
+async function main() {
     const args = process.argv.slice(2);
     
     if (args.length === 0) {
@@ -259,6 +260,16 @@ function main() {
             if (indexUpdated) {
                 console.log(`✅ Events index updated`);
             }
+            
+            // Generate/update monthly event cards
+            try {
+                console.log(`🎨 Generating monthly event cards...`);
+                await generateEventCards();
+                console.log(`✅ Monthly event cards updated successfully`);
+            } catch (cardError) {
+                console.error(`⚠️  Warning: Failed to update event cards: ${cardError.message}`);
+                console.error(`   Event was still saved successfully. You can manually run 'npm run generate-cards' later.`);
+            }
         } else {
             // Output to stdout
             console.log(jsonOutput);
@@ -277,7 +288,10 @@ function main() {
 
 // If running directly (not imported)
 if (require.main === module) {
-    main();
+    main().catch(error => {
+        console.error('Error:', error.message);
+        process.exit(1);
+    });
 }
 
 module.exports = { parseCSVToEvent };

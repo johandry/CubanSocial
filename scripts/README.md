@@ -1,16 +1,64 @@
-# CSV to Event JSON Converter
+# Scripts
 
-This tool converts CSV-like event submission data (typically from form submissions) into proper JSON format compatible with the Cuban Social event system.
+This directory contains utility scripts for managing Cuban Social event data.
 
-## Usage
+## Event Card Generator
 
-### NPM Script (Recommended)
+### generate-event-cards.js
+
+Generates monthly event cards as PNG images based on the events in `data/events/`. Each month gets a different color scheme, and the cards follow the style shown in the attached reference image.
+
+#### Usage
+
+```bash
+npm run generate-cards
+# or
+node scripts/generate-event-cards.js
+```
+
+To list the generated cards:
+
+```bash
+npm run list-cards
+# or
+node scripts/list-cards.js
+```
+
+#### Output
+
+- Images are saved to `data/cards/` directory
+- Filename format: `events-YYYY-MM.png`
+- Cards include:
+  - Month name and year in header
+  - Individual event entries with date, time, location, and event type
+  - Color-coded by month
+  - Responsive layout that accommodates multiple events
+
+#### Features
+
+- Automatic month color scheme rotation
+- Spanish month names and day names
+- Time formatting (12-hour format with AM/PM)
+- Location name extraction (venue name only)
+- Event type badges (salsa, bachata, timba, etc.)
+- Rounded corners and modern design
+- **Automatic generation**: Cards are automatically updated when new events are added via `csv-to-event-json.js`
+
+---
+
+## CSV to Event JSON Converter
+
+This tool converts CSV-like event submission data (typically from form submissions) into proper JSON format compatible with the Cuban Social event system. **After successfully adding a new event, it automatically regenerates the monthly event cards.**
+
+### CSV Converter Usage
+
+#### NPM Script (Recommended)
 
 ```bash
 npm run convert-event <input-file> [output-file]
 ```
 
-### Node.js Script
+#### Node.js Script
 
 ```bash
 node scripts/csv-to-event-json.js <input-file> [output-file]
@@ -19,28 +67,28 @@ node scripts/csv-to-event-json.js - (read from stdin)
 
 If no output file is specified, the script automatically generates a filename based on the event date in the format `event-<yymmdd>.json` and saves it to the `data/events/` directory.
 
-## Examples
+### CSV Converter Examples
 
-### Convert with automatic filename generation
+#### Convert with automatic filename generation
 
 ```bash
 npm run convert-event data/events-pending/sample-event.csv
 # Generates: data/events/event-250906.json (based on event date)
 ```
 
-### Convert and specify output file
+#### Convert and specify output file
 
 ```bash
 npm run convert-event data/events-pending/sample-event.csv data/events/custom-name.json
 ```
 
-### Convert from stdin
+#### Convert from stdin
 
 ```bash
 cat event-data.csv | npm run convert-event -
 ```
 
-## Input Format
+### Input Format
 
 The script expects a CSV-like format with key-value pairs:
 
