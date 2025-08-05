@@ -72,13 +72,13 @@ class CubanSocialApp {
     async loadEvents() {
         try {
             this.events = await this.loadEventsFromDirectory();
-            this.filteredEvents = [...this.events];
+            // Apply filters instead of copying all events
+            this.applyFilters();
         } catch (error) {
             console.error('Error loading events:', error);
-            // Fallback to sample events if loading from files fails
-            this.events = await this.loadSampleEvents();
-            this.filteredEvents = [...this.events];
-            this.showError('Using sample events. Event files may not be available.');
+            this.showError(`Failed to load events: ${error.message}`);
+            this.events = [];
+            this.filteredEvents = [];
         }
     }
 
@@ -134,73 +134,13 @@ class CubanSocialApp {
         return events;
     }
 
-    async loadSampleEvents() {
-        return [
-            {
-                id: "event-001",
-                name: "Salsa Social Night",
-                date: "2025-02-07T20:00:00",
-                end_date: "2025-02-07T23:30:00",
-                location: "Dance Studio San Diego",
-                maps_link: "https://maps.google.com/?q=Dance+Studio+San+Diego",
-                type: ["salsa"],
-                music: "Live Band",
-                price: "$15",
-                description: "Weekly Friday night salsa social with live music",
-                contact: "info@dancestudio.com",
-                featured: true,
-                recurring: "weekly"
-            },
-            {
-                id: "event-002",
-                name: "Cuban Timba Workshop",
-                date: "2025-02-15T15:00:00",
-                end_date: "2025-02-15T17:00:00",
-                location: "Latin Dance Academy, NY",
-                maps_link: "https://maps.google.com/?q=Latin+Dance+Academy",
-                type: ["timba"],
-                music: "DJ Set",
-                price: "$25",
-                description: "Learn authentic Cuban timba with professional instructors",
-                contact: "@latinacademy",
-                featured: true
-            },
-            {
-                id: "event-003",
-                name: "Friday Night Salsa Social",
-                date: "2025-02-07T20:00:00",
-                location: "Dance Studio Miami, FL",
-                maps_link: "https://maps.google.com/?q=Dance+Studio+Miami",
-                type: ["salsa"],
-                music: "Live Band",
-                price: "$15",
-                description: "Join us for an evening of salsa dancing",
-                featured: false
-            },
-            {
-                id: "event-004",
-                name: "Bachata Sensual Night",
-                date: "2025-02-16T19:00:00",
-                end_date: "2025-02-17T01:00:00",
-                location: "Salsa Club Los Angeles, CA",
-                maps_link: "https://maps.google.com/?q=Salsa+Club+Los+Angeles",
-                type: ["bachata"],
-                music: "DJ Set",
-                price: "Free",
-                description: "Bachata sensual night with top DJs",
-                featured: false
-            }
-        ];
-    }
-
     async loadCongresses() {
         try {
             this.congresses = await this.loadCongressesFromDirectory();
         } catch (error) {
             console.error('Error loading congresses:', error);
-            // Fallback to sample congresses if loading from files fails
-            this.congresses = await this.loadSampleCongresses();
-            this.showError('Using sample congresses. Congress files may not be available.');
+            this.showError(`Failed to load congresses: ${error.message}`);
+            this.congresses = [];
         }
     }
 
@@ -255,45 +195,13 @@ class CubanSocialApp {
         return congresses;
     }
 
-    async loadSampleCongresses() {
-        return [
-            {
-                id: "sandiego2025",
-                name: "San Diego Salsa Congress 2025",
-                date: "2025-08-15",
-                end_date: "2025-08-18",
-                location: "San Diego Convention Center, San Diego, CA",
-                maps_link: "https://maps.google.com/?q=San+Diego+Convention+Center",
-                description: "The biggest Latin dance event of the year in Southern California.",
-                website: "https://sandiegosalsacongress.com",
-                type: ["salsa", "bachata", "timba"],
-                featured_artists: ["Adolfo Indacochea", "Karen & Ricardo"],
-                price: "$299 Full Pass"
-            },
-            {
-                id: "labachata2025",
-                name: "LA Bachata Festival 2025",
-                date: "2025-10-20",
-                end_date: "2025-10-22",
-                location: "Los Angeles Convention Center, Los Angeles, CA",
-                maps_link: "https://maps.google.com/?q=Los+Angeles+Convention+Center",
-                description: "Premier bachata festival with sensual and traditional workshops.",
-                website: "https://labachatafestival.com",
-                type: ["bachata"],
-                featured_artists: ["Daniel & Desiree", "Corky & Judith"],
-                price: "$249 Weekend Pass"
-            }
-        ];
-    }
-
     async loadPlaylists() {
         try {
             this.playlists = await this.loadPlaylistsFromDirectory();
         } catch (error) {
             console.error('Error loading playlists:', error);
-            // Fallback to sample playlists if loading from files fails
-            this.playlists = await this.loadSamplePlaylists();
-            this.showError('Using sample playlists. Playlist files may not be available.');
+            this.showError(`Failed to load playlists: ${error.message}`);
+            this.playlists = [];
         }
     }
 
@@ -340,31 +248,6 @@ class CubanSocialApp {
         }
         
         return playlists;
-    }
-
-    async loadSamplePlaylists() {
-        return [
-            {
-                id: "cuban-salsa",
-                name: "Best of Cuban Salsa",
-                description: "Classic salsa tracks from the masters of Cuban music",
-                track_count: 45,
-                duration: "3h 24min",
-                playlist_url: "https://open.spotify.com/playlist/cuban-salsa-example",
-                tags: ["salsa", "cuban", "classic"],
-                featured: true
-            },
-            {
-                id: "timba-hits",
-                name: "Timba Hits 2025",
-                description: "Latest timba tracks that are setting dance floors on fire",
-                track_count: 32,
-                duration: "2h 18min",
-                playlist_url: "https://music.youtube.com/playlist?list=timba-hits-example",
-                tags: ["timba", "modern", "high-energy"],
-                featured: true
-            }
-        ];
     }
 
     setupNavigation() {
@@ -527,6 +410,13 @@ class CubanSocialApp {
         document.getElementById('featured-filter')?.addEventListener('change', (e) => {
             this.trackEvent('filter_used', {
                 filter_type: 'featured',
+                filter_value: e.target.checked ? 'enabled' : 'disabled'
+            });
+            this.applyFilters();
+        });
+        document.getElementById('past-events-filter')?.addEventListener('change', (e) => {
+            this.trackEvent('filter_used', {
+                filter_type: 'past_events',
                 filter_value: e.target.checked ? 'enabled' : 'disabled'
             });
             this.applyFilters();
@@ -724,6 +614,20 @@ class CubanSocialApp {
         const upcomingEvents = this.filteredEvents.slice(0, this.displayedEventCount);
         console.log(`Rendering ${upcomingEvents.length} upcoming events out of ${this.filteredEvents.length} filtered events`);
         
+        if (upcomingEvents.length === 0) {
+            container.innerHTML = `
+                <div class="no-events-message">
+                    <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-calendar-times" style="font-size: 48px; margin-bottom: 16px; color: var(--text-light);"></i>
+                        <h3 style="margin-bottom: 8px; color: var(--text-color);">No Events Available</h3>
+                        <p>No events are currently loaded. Please check back later or contact us if you believe this is an error.</p>
+                    </div>
+                </div>
+            `;
+            this.updateLoadMoreButton();
+            return;
+        }
+        
         container.innerHTML = upcomingEvents.map(event => `
             <div class="featured-event-card">
                 <h3 class="event-title">${event.name}</h3>
@@ -808,7 +712,7 @@ class CubanSocialApp {
             dayDiv.textContent = day;
 
             // Check if there are events on this day
-            const dayEvents = this.events.filter(event => {
+            const dayEvents = this.filteredEvents.filter(event => {
                 const eventDate = new Date(event.date);
                 return eventDate.getDate() === day && 
                        eventDate.getMonth() === this.currentMonth && 
@@ -858,15 +762,20 @@ class CubanSocialApp {
         const danceFilter = document.getElementById('dance-filter')?.value || '';
         const musicFilter = document.getElementById('music-filter')?.value || '';
         const locationFilter = document.getElementById('location-filter')?.value.toLowerCase() || '';
-        const featuredFilter = document.getElementById('featured-filter')?.value || '';
+        const featuredFilter = document.getElementById('featured-filter')?.checked || false;
+        const showPastEvents = document.getElementById('past-events-filter')?.checked || false;
+        
+        const now = new Date();
 
         this.filteredEvents = this.events.filter(event => {
+            const eventDate = new Date(event.date);
             const matchesDance = !danceFilter || event.type.includes(danceFilter);
             const matchesMusic = !musicFilter || event.music === musicFilter;
             const matchesLocation = !locationFilter || event.location.toLowerCase().includes(locationFilter);
-            const matchesFeatured = !featuredFilter || (featuredFilter === 'true' && (event.featured || event.recurring));
+            const matchesFeatured = !featuredFilter || event.featured || event.recurring;
+            const matchesTimeFilter = showPastEvents || eventDate > now;
             
-            return matchesDance && matchesMusic && matchesLocation && matchesFeatured;
+            return matchesDance && matchesMusic && matchesLocation && matchesFeatured && matchesTimeFilter;
         });
 
         // Reset displayed count when filters change
@@ -926,7 +835,7 @@ class CubanSocialApp {
 
     showDayEvents(day, month, year) {
         // Get events for the specific day
-        const dayEvents = this.events.filter(event => {
+        const dayEvents = this.filteredEvents.filter(event => {
             const eventDate = new Date(event.date);
             return eventDate.getDate() === day && 
                    eventDate.getMonth() === month && 
@@ -1563,30 +1472,55 @@ class CubanSocialApp {
             color: white;
             padding: 16px;
             border-radius: 8px;
-            margin-bottom: 16px;
+            margin: 16px auto;
             text-align: center;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         `;
         errorDiv.innerHTML = `
             <h4><i class="fas fa-exclamation-circle"></i> Error</h4>
             <p>${message}</p>
         `;
         
+        // Try to find a good place to show the error
         const form = document.getElementById('event-form');
-        if (form) {
-            // Insert error before the form
+        const eventsContainer = document.getElementById('events-list');
+        const mainContent = document.querySelector('main');
+        
+        if (form && message.includes('submit')) {
+            // Form-related errors
             form.parentNode.insertBefore(errorDiv, form);
-            
-            // Scroll to the error message
             errorDiv.scrollIntoView({ behavior: 'smooth' });
-            
-            // Remove the error after 5 seconds
-            setTimeout(() => errorDiv.remove(), 5000);
+        } else if (eventsContainer && (message.includes('events') || message.includes('loading'))) {
+            // Events loading errors
+            eventsContainer.appendChild(errorDiv);
+        } else if (mainContent) {
+            // General errors - show at top of main content
+            mainContent.insertBefore(errorDiv, mainContent.firstChild);
+            errorDiv.scrollIntoView({ behavior: 'smooth' });
         }
+        
+        // Remove the error after 10 seconds for loading errors, 5 seconds for form errors
+        const timeout = message.includes('submit') ? 5000 : 10000;
+        setTimeout(() => errorDiv.remove(), timeout);
     }
 
     renderCongresses() {
         const container = document.getElementById('congress-list');
         if (!container) return;
+
+        if (this.congresses.length === 0) {
+            container.innerHTML = `
+                <div class="no-congresses-message">
+                    <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-graduation-cap" style="font-size: 48px; margin-bottom: 16px; color: var(--text-light);"></i>
+                        <h3 style="margin-bottom: 8px; color: var(--text-color);">No Congresses Available</h3>
+                        <p>No congresses are currently loaded. Please check back later or contact us if you believe this is an error.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
 
         container.innerHTML = this.congresses.map(congress => `
             <div class="congress-card">
@@ -1634,7 +1568,15 @@ class CubanSocialApp {
         if (!container) return;
 
         if (this.playlists.length === 0) {
-            container.innerHTML = '<p>No playlists available.</p>';
+            container.innerHTML = `
+                <div class="no-playlists-message">
+                    <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-music" style="font-size: 48px; margin-bottom: 16px; color: var(--text-light);"></i>
+                        <h3 style="margin-bottom: 8px; color: var(--text-color);">No Playlists Available</h3>
+                        <p>No playlists are currently loaded. Please check back later or contact us if you believe this is an error.</p>
+                    </div>
+                </div>
+            `;
             return;
         }
 
