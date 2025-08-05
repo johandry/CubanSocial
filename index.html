@@ -334,6 +334,26 @@
                     </div>
                     
                     <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="recurring-event" name="recurring">
+                            <span class="checkmark"></span>
+                            This is a recurring event
+                        </label>
+                    </div>
+                    
+                    <div class="recurring-group" id="recurring-options" style="display: none;">
+                        <div class="form-group">
+                            <label for="recurring-frequency">Frequency</label>
+                            <select id="recurring-frequency" name="recurring_frequency">
+                                <option value="">Select frequency</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="description">Description</label>
                         <textarea id="description" name="description" rows="4" 
                                   placeholder="Additional details about the event, special guests, dress code, etc."></textarea>
@@ -343,6 +363,21 @@
                         <label for="contact">Event Contact Information</label>
                         <input type="text" id="contact" name="contact" 
                                placeholder="Phone, email, Instagram handle, or website for event attendees">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-url">Event URL</label>
+                            <input type="url" id="event-url" name="event_url" 
+                                   placeholder="https://example.com/event-page">
+                            <small class="form-help">Link to official event page, RSVP, or ticket sales</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-url-text">Button Text</label>
+                            <input type="text" id="event-url-text" name="event_url_text" 
+                                   placeholder="e.g., RSVP, Buy Tickets, Info & Buy Tickets, Buy Tickets & Save">
+                            <small class="form-help">Text to display on the button (default: "Official Event Page")</small>
+                        </div>
                     </div>
 
                     <div class="form-row">
@@ -367,19 +402,6 @@
                             <span class="checkmark"></span>
                             Send me a confirmation email with submission details
                         </label>
-                    </div>
-                    
-                    <div class="form-group recurring-group">
-                        <label class="checkbox-label recurring-checkbox">
-                            <input type="checkbox" id="recurring" name="recurring">
-                            <span class="checkmark"></span>
-                            This is a recurring event
-                        </label>
-                        <select id="recurring-frequency" name="recurring_frequency" class="recurring-select" style="display: none;">
-                            <option value="weekly">Weekly (every week)</option>
-                            <option value="monthly">Monthly (every month)</option>
-                            <option value="biweekly">Bi-weekly (every 2 weeks)</option>
-                        </select>
                     </div>
                     
                     <div class="form-actions">

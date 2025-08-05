@@ -3,7 +3,12 @@
 /**
  * Script to convert CSV-like event data to JSON format
  * Usage: node csv-to-event-json.js <input-file> [output-file]
- * If no output file is specified, generates event-<yymmdd>.json in data/events/
+ * If no output file is specified, generates even    // Return fields in the specified order
+    const orderedEvent = {};
+    const fieldOrder = [
+        'id', 'name', 'date', 'end_date', 'location', 'maps_link', 'type', 
+        'music', 'price', 'payment_link', 'event_url', 'event_url_text', 'description', 'contact', 'featured', 'created_at'
+    ];mdd>.json in data/events/
  */
 
 const fs = require('fs');

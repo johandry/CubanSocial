@@ -574,13 +574,22 @@ class CubanSocialApp {
             });
         }
         
-        // Setup recurring event checkbox
-        const recurringCheckbox = document.getElementById('recurring');
-        const recurringFrequency = document.getElementById('recurring-frequency');
+        // Recurring event checkbox toggle
+        const recurringCheckbox = document.getElementById('recurring-event');
+        const recurringOptions = document.getElementById('recurring-options');
         
-        if (recurringCheckbox && recurringFrequency) {
-            recurringCheckbox.addEventListener('change', () => {
-                recurringFrequency.style.display = recurringCheckbox.checked ? 'block' : 'none';
+        if (recurringCheckbox && recurringOptions) {
+            recurringCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    recurringOptions.style.display = 'block';
+                } else {
+                    recurringOptions.style.display = 'none';
+                    // Reset the frequency selection when unchecked
+                    const frequencySelect = document.getElementById('recurring-frequency');
+                    if (frequencySelect) {
+                        frequencySelect.value = '';
+                    }
+                }
             });
         }
         
@@ -688,10 +697,18 @@ class CubanSocialApp {
                     <button class="more-info-btn" onclick="app.showEventDetails('${event.id}')">
                         More Info
                     </button>
+                    ${event.payment_link ? `<a href="${event.payment_link}" target="_blank" class="payment-btn">
+                        <i class="fas fa-credit-card"></i> Buy Tickets
+                    </a>` : ''}
                     <a href="${event.maps_link}" target="_blank" class="directions-btn">
                         <i class="fas fa-directions"></i> Directions
                     </a>
                 </div>
+                ${event.event_url ? `<div class="event-actions-secondary">
+                    <a href="${event.event_url}" target="_blank" class="event-url-btn-full">
+                        <i class="fas fa-external-link-alt"></i> ${event.event_url_text || 'Official Event Page'}
+                    </a>
+                </div>` : ''}
             </div>
         `).join('');
     }
@@ -737,10 +754,18 @@ class CubanSocialApp {
                     <button class="more-info-btn" onclick="app.showEventDetails('${event.id}')">
                         More Info
                     </button>
+                    ${event.payment_link ? `<a href="${event.payment_link}" target="_blank" class="payment-btn">
+                        <i class="fas fa-credit-card"></i> Buy Tickets
+                    </a>` : ''}
                     <a href="${event.maps_link}" target="_blank" class="directions-btn">
                         <i class="fas fa-directions"></i> Directions
                     </a>
                 </div>
+                ${event.event_url ? `<div class="event-actions-secondary">
+                    <a href="${event.event_url}" target="_blank" class="event-url-btn-full">
+                        <i class="fas fa-external-link-alt"></i> ${event.event_url_text || 'Official Event Page'}
+                    </a>
+                </div>` : ''}
             </div>
         `).join('');
 
@@ -989,14 +1014,22 @@ class CubanSocialApp {
                                 <span class="event-price">${event.price}</span>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button onclick="app.showEventDetails('${event.id}')" class="more-info-btn" style="flex: 1;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                            <button onclick="app.showEventDetails('${event.id}')" class="more-info-btn" style="flex: 1; min-width: 100px;">
                                 More Info
                             </button>
-                            <a href="${event.maps_link}" target="_blank" class="directions-btn" style="flex: 1;">
+                            ${event.payment_link ? `<a href="${event.payment_link}" target="_blank" class="payment-btn" style="flex: 1; min-width: 100px;">
+                                <i class="fas fa-credit-card"></i> Buy Tickets
+                            </a>` : ''}
+                            <a href="${event.maps_link}" target="_blank" class="directions-btn" style="flex: 1; min-width: 100px;">
                                 <i class="fas fa-directions"></i> Directions
                             </a>
                         </div>
+                        ${event.event_url ? `<div style="margin-top: 8px;">
+                            <a href="${event.event_url}" target="_blank" class="event-url-btn-full" style="width: 100%; display: block; text-align: center;">
+                                <i class="fas fa-external-link-alt"></i> ${event.event_url_text || 'Official Event Page'}
+                            </a>
+                        </div>` : ''}
                     </div>
                 `).join('')}
             </div>
@@ -1153,12 +1186,6 @@ class CubanSocialApp {
             this.showSuccessMessage(response.request_number);
             form.reset();
             
-            // Reset the recurring frequency dropdown
-            const recurringFrequency = document.getElementById('recurring-frequency');
-            if (recurringFrequency) {
-                recurringFrequency.style.display = 'none';
-            }
-            
         } catch (error) {
             console.error('Error submitting event:', error);
             this.showError('Failed to submit event. Please try again.');
@@ -1187,15 +1214,17 @@ class CubanSocialApp {
             data.end_date = `${data.date.split('T')[0]}T${data.end_time}:00`;
         }
         
-        // Handle boolean checkboxes
-        if (formData.get('recurring') === 'on') {
-            data.recurring = data.recurring_frequency || 'weekly';
-            // Clean up the raw checkbox value
-            delete data.recurring_frequency;
-        }
-        
         // Handle confirmation email checkbox
         data.send_confirmation = formData.get('send_confirmation') === 'on';
+        
+        // Handle recurring event checkbox
+        data.recurring = formData.get('recurring') === 'on';
+        if (data.recurring && data.recurring_frequency) {
+            data.recurring = data.recurring_frequency;
+        } else if (!data.recurring) {
+            // Remove recurring_frequency if recurring is not checked
+            delete data.recurring_frequency;
+        }
         
         // Add metadata
         data.id = 'event-' + Date.now();

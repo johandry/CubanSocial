@@ -279,6 +279,37 @@ body {
     margin-top: 16px;
 }
 
+/* Secondary Event Actions Container */
+.event-actions-secondary {
+    margin-top: 8px;
+}
+
+/* Event URL Button - Full Width */
+.event-url-btn-full {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.event-url-btn-full:hover {
+    background-color: #253270;
+}
+
+.event-url-btn-full i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
 /* Directions Button */
 .directions-btn {
     background-color: var(--accent-color);
@@ -302,6 +333,58 @@ body {
 }
 
 .directions-btn i {
+    font-size: 14px;
+}
+
+/* Payment Button */
+.payment-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.payment-btn:hover {
+    background-color: #0D8AA3;
+}
+
+.payment-btn i {
+    font-size: 14px;
+}
+
+/* Event URL Button - Full Width */
+.event-url-btn-full {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.event-url-btn-full:hover {
+    background-color: #253270;
+}
+
+.event-url-btn-full i {
+    margin-right: 8px;
     font-size: 14px;
 }
 
@@ -659,6 +742,15 @@ textarea:focus {
     margin-top: 8px;
 }
 
+.recurring-group {
+    margin-left: 24px;
+    margin-top: 12px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent-color);
+}
+
 .checkbox-label {
     display: flex;
     align-items: center;
@@ -680,22 +772,6 @@ textarea:focus {
     width: 16px;
     height: 16px;
     margin-right: 8px;
-}
-
-.recurring-group {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 16px;
-    background: #f8f9fa;
-}
-
-.recurring-checkbox {
-    margin-bottom: 12px;
-}
-
-.recurring-select {
-    margin-left: 24px;
-    max-width: 200px;
 }
 
 .form-actions {
