@@ -59,10 +59,10 @@ class CubanSocialApp {
             await this.loadMonthlyCards();
             this.setupCarousel();
             
-            // Initialize with Home (Events) section active
-            console.log('About to show Home section');
-            this.showSection('home');
-            this.setActiveNavLink('home');
+            // Initialize with Landing section active
+            console.log('About to show Landing section');
+            this.showSection('landing');
+            this.setActiveNavLink('landing');
             console.log('Initialization complete');
         } catch (error) {
             console.error('Error during initialization:', error);
@@ -404,7 +404,7 @@ class CubanSocialApp {
     getSectionTitle(sectionId) {
         const titles = {
             'landing': 'Cuban Social - Home',
-            'home': 'Events',
+            'events': 'Events',
             'congresses': 'Congresses', 
             'playlists': 'Playlists',
             'submit': 'Submit Event'
@@ -428,7 +428,7 @@ class CubanSocialApp {
     showSection(sectionId) {
         console.log(`Showing section: ${sectionId}`);
         // Hide all sections
-        document.querySelectorAll('.section, .home-section, .landing-section').forEach(section => {
+        document.querySelectorAll('.section, .events-section, .landing-section').forEach(section => {
             section.style.display = 'none';
         });
 
@@ -440,15 +440,15 @@ class CubanSocialApp {
                 landingSection.style.display = 'block';
                 console.log('Landing section display set to block');
             }
-        } else if (sectionId === 'home' || sectionId === 'events') {
+        } else if (sectionId === 'events') {
             console.log('Setting up Events section');
-            const homeSection = document.getElementById('home');
+            const eventsSection = document.getElementById('events');
             const upcomingSection = document.querySelector('.upcoming-section');
             const filtersSection = document.querySelector('.filters-section');
             const calendarContainer = document.getElementById('calendar-container');
             
-            if (homeSection) {
-                homeSection.style.display = 'block';
+            if (eventsSection) {
+                eventsSection.style.display = 'block';
                 console.log('Events section display set to block');
             } else {
                 console.error('Events section element not found!');
@@ -1426,7 +1426,7 @@ class CubanSocialApp {
                         Submit Another Event
                     </button>
                     
-                    <button onclick="app.showSection('home'); app.setActiveNavLink('home')" style="
+                    <button onclick="app.showSection('events'); app.setActiveNavLink('events')" style="
                         background-color: #6b7280;
                         color: white;
                         border: none;
