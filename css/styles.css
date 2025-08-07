@@ -855,6 +855,24 @@ textarea:focus {
     background-color: var(--secondary-color);
 }
 
+/* Switch Group Container for multiple switches */
+.switch-group-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.switch-group-container .switch-label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    margin: 0;
+    cursor: pointer;
+}
+
 .form-actions {
     text-align: center;
     margin-top: 32px;
@@ -1139,6 +1157,15 @@ textarea:focus {
 
 .action-btn:hover {
     background-color: #B5182A;
+}
+
+.action-btn.secondary-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.action-btn.secondary-btn:hover {
+    background-color: #218838;
 }
 
 /* Responsive Design */

@@ -455,11 +455,22 @@ class CubanSocialApp {
                     const locationQuery = encodeURIComponent(locationField.value.trim());
                     const mapsUrl = `https://maps.google.com/?q=${locationQuery}`;
                     mapsLinkField.value = mapsUrl;
-                    
-                    // Open the generated URL in a new tab
-                    window.open(mapsUrl, '_blank');
                 } else if (!locationField.value.trim()) {
                     alert('Please enter a location first.');
+                }
+            });
+        }
+
+        // Open Google Maps link
+        const openMapsBtn = document.getElementById('open-maps-link');
+        if (openMapsBtn) {
+            openMapsBtn.addEventListener('click', () => {
+                const mapsLinkField = document.getElementById('maps-link');
+                
+                if (mapsLinkField && mapsLinkField.value.trim()) {
+                    window.open(mapsLinkField.value.trim(), '_blank');
+                } else {
+                    alert('Please generate or enter a Google Maps link first.');
                 }
             });
         }
