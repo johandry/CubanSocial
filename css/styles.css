@@ -1279,7 +1279,7 @@ textarea:focus {
     flex-wrap: wrap;
 }
 
-.cta-primary, .cta-secondary {
+.cta-primary, .cta-secondary, .cta-app {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1310,6 +1310,16 @@ textarea:focus {
 .cta-secondary:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
+}
+
+.cta-app {
+    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+    color: white;
+}
+
+.cta-app:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(15, 156, 182, 0.3);
 }
 
 /* Cards Carousel Section */
@@ -1472,7 +1482,7 @@ textarea:focus {
         align-items: center;
     }
     
-    .cta-primary, .cta-secondary {
+    .cta-primary, .cta-secondary, .cta-app {
         width: 100%;
         max-width: 300px;
         justify-content: center;
