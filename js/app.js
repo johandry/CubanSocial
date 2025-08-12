@@ -1,4 +1,5 @@
 // Cuban Social - Modern Design Application JavaScript
+import { supabase } from './supabaseClient.js';
 
 class CubanSocialApp {
     constructor() {
@@ -71,7 +72,17 @@ class CubanSocialApp {
 
     async loadEvents() {
         try {
-            this.events = await this.loadEventsFromDirectory();
+            // Try to load from API first
+            try {
+                this.events = await this.loadEventsFromAPI();
+                console.log('Successfully loaded events from API');
+            } catch (apiError) {
+                console.warn('API failed, falling back to local data:', apiError.message);
+                // Fallback to local data if API fails
+                this.events = await this.loadEventsFromDirectory();
+                console.log('Successfully loaded events from local directory');
+            }
+            
             // Apply filters instead of copying all events
             this.applyFilters();
         } catch (error) {
@@ -82,20 +93,47 @@ class CubanSocialApp {
         }
     }
 
+    async loadEventsFromAPI() {
+        try {
+            console.log('Loading events from Supabase API...');
+            
+            // Fetch approved events from Supabase
+            const { data: events, error } = await supabase
+                .from('events')
+                .select('*')
+                .eq('approved', true)
+                .order('date', { ascending: true });
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
+            console.log(`Loaded ${events?.length || 0} approved events from API`);
+            return events || [];
+        } catch (error) {
+            console.error('Error loading events from API:', error);
+            throw error;
+        }
+    }
+
     async loadEventsFromDirectory() {
         const events = [];
         
         try {
             // Try to load events index file first (if it exists)
-            const indexResponse = await fetch('data/events/index.json');
+            const indexResponse = await fetch('data/eventos/index.json');
             if (indexResponse.ok) {
                 const eventIndex = await indexResponse.json();
                 for (const filename of eventIndex.files) {
                     try {
-                        const response = await fetch(`data/events/${filename}`);
+                        const response = await fetch(`data/eventos/${filename}`);
                         if (response.ok) {
                             const eventData = await response.json();
-                            events.push(eventData);
+                            // Include events that are approved (boolean true) OR don't have approval fields (legacy events)
+                            if (eventData.approved === true || (!eventData.hasOwnProperty('approved') && !eventData.hasOwnProperty('status'))) {
+                                events.push(eventData);
+                            }
                         }
                     } catch (error) {
                         console.warn(`Error loading ${filename}:`, error);
@@ -104,17 +142,27 @@ class CubanSocialApp {
             } else {
                 // Fallback: try to load known event files
                 const eventFiles = [
-                    'event-001.json',
-                    'event-002.json'
-                    // Add more files as they are created
+                    'event-250802.json',
+                    'event-250808.json',
+                    'event-250809.json',
+                    'event-250816.json',
+                    'event-250817.json',
+                    'event-250823.json',
+                    'event-250829.json',
+                    'event-250906.json',
+                    'event-250919.json',
+                    'event-250920.json'
                 ];
                 
                 for (const filename of eventFiles) {
                     try {
-                        const response = await fetch(`data/events/${filename}`);
+                        const response = await fetch(`data/eventos/${filename}`);
                         if (response.ok) {
                             const eventData = await response.json();
-                            events.push(eventData);
+                            // Include events that are approved (boolean true) OR don't have approval fields (legacy events)
+                            if (eventData.approved === true || (!eventData.hasOwnProperty('approved') && !eventData.hasOwnProperty('status'))) {
+                                events.push(eventData);
+                            }
                         } else {
                             console.warn(`Could not load ${filename}: ${response.status}`);
                         }
@@ -124,7 +172,7 @@ class CubanSocialApp {
                 }
             }
         } catch (error) {
-            console.error('Error accessing events directory:', error);
+            console.error('Error accessing eventos directory:', error);
             throw error;
         }
         
@@ -1155,9 +1203,9 @@ class CubanSocialApp {
     }
 
     async createRequest(eventData) {
-        // Real implementation using Formspree
-        console.log('Submitting event request:', eventData);
-        
+        // Supabase implementation
+        console.log('Submitting event request to Supabase:', eventData);
+
         // Create loading indicator
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading-indicator';
@@ -1166,56 +1214,59 @@ class CubanSocialApp {
             margin: 20px 0;
         `;
         loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting your event...';
-        
+
         const form = document.getElementById('event-form');
         if (form) {
             form.appendChild(loadingDiv);
         }
-        
+
         try {
-            // Format the data for better email readability
-            const formattedData = {
-                ...eventData,
-                // Improve email display with formatted date
-                formatted_date: this.formatEventTime(eventData.date, eventData.recurring, eventData.end_date),
-                // Mark as event submission email
-                _subject: `Cuban Social: New Event Submission - ${eventData.name}`,
-                // Add email confirmation flag for Formspree
-                _cc: eventData.send_confirmation ? eventData.requestor_contact : ''
+            // Supabase client is already imported at the top of the file
+
+            // Prepare event data for Supabase
+            const supabaseEvent = {
+                id: eventData.id,
+                name: eventData.name,
+                date: eventData.date,
+                location: eventData.location,
+                maps_link: eventData.maps_link,
+                type: eventData.type,
+                music: eventData.music,
+                price: eventData.price,
+                description: eventData.description,
+                contact: eventData.contact,
+                approved: false,
+                featured: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             };
-            
-            // Use Formspree to send data to admin email
-            const response = await fetch('https://formspree.io/f/xvgqrqqk', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(formattedData)
-            });
-            
-            const result = await response.json();
-            
-            if (!response.ok) {
-                throw new Error('Failed to submit event. ' + (result.error || ''));
+
+            // Remove fields not in table schema
+            // These fields are not stored in the events table but used for processing
+            // send_confirmation, requestor_name, requestor_contact, recurring, recurring_frequency, end_date, event_url, event_url_text
+
+            // Insert into Supabase
+            const { data, error } = await supabase.from('events').insert([supabaseEvent]);
+            if (error) {
+                throw new Error('Supabase error: ' + error.message);
             }
-            
+
             // Log the requestor information
             if (eventData.requestor_name && eventData.requestor_contact) {
                 console.log(`Event submission from: ${eventData.requestor_name} (${eventData.requestor_contact})`);
             }
-            
+
             // Generate request number for confirmation
             const requestNumber = Math.floor(Math.random() * 1000) + 1;
-            console.log('Event submitted successfully:', requestNumber);
-            
+            console.log('Event submitted successfully to Supabase:', requestNumber);
+
             // Remove loading indicator
             loadingDiv.remove();
-            
-            return { 
-                success: true, 
+
+            return {
+                success: true,
                 request_number: requestNumber,
-                message: result.message || 'Submission received'
+                message: 'Submission received'
             };
         } catch (error) {
             console.error('Submission error:', error);
