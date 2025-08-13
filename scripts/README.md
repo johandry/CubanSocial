@@ -10,7 +10,7 @@ Generates monthly event cards as PNG images based on approved events from the Su
 
 The script will:
 
-1. Load approved events from Supabase database (`approved = true`)
+1. Load approved events from Supabase database (`status = 'approved'`)
 2. Group events by month and generate a card for each month with events
 3. Save cards as PNG files in `data/cards/`
 

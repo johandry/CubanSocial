@@ -210,7 +210,7 @@ async function loadEventsFromSupabase() {
         const { data: events, error } = await supabase
             .from('events')
             .select('*')
-            .eq('approved', true)
+            .eq('status', 'approved')
             .order('date', { ascending: true });
 
         if (error) {

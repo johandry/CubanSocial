@@ -101,7 +101,7 @@ class CubanSocialApp {
             const { data: events, error } = await supabase
                 .from('events')
                 .select('*')
-                .eq('approved', true)
+                .eq('status', 'approved')
                 .order('date', { ascending: true });
 
             if (error) {
@@ -130,8 +130,8 @@ class CubanSocialApp {
                         const response = await fetch(`data/eventos/${filename}`);
                         if (response.ok) {
                             const eventData = await response.json();
-                            // Include events that are approved (boolean true) OR don't have approval fields (legacy events)
-                            if (eventData.approved === true || (!eventData.hasOwnProperty('approved') && !eventData.hasOwnProperty('status'))) {
+                            // Include events that are approved OR don't have status fields (legacy events)
+                            if (eventData.status === 'approved' || !eventData.hasOwnProperty('status')) {
                                 events.push(eventData);
                             }
                         }
@@ -159,8 +159,8 @@ class CubanSocialApp {
                         const response = await fetch(`data/eventos/${filename}`);
                         if (response.ok) {
                             const eventData = await response.json();
-                            // Include events that are approved (boolean true) OR don't have approval fields (legacy events)
-                            if (eventData.approved === true || (!eventData.hasOwnProperty('approved') && !eventData.hasOwnProperty('status'))) {
+                            // Include events that are approved OR don't have status fields (legacy events)
+                            if (eventData.status === 'approved' || !eventData.hasOwnProperty('status')) {
                                 events.push(eventData);
                             }
                         } else {
@@ -830,7 +830,7 @@ class CubanSocialApp {
             const eventDate = new Date(event.date);
             const matchesDance = !danceFilter || event.type.includes(danceFilter);
             const matchesMusic = !musicFilter || event.music === musicFilter;
-            const matchesLocation = !locationFilter || event.location.toLowerCase().includes(locationFilter);
+            const matchesLocation = !locationFilter || (event.location || '').toLowerCase().includes(locationFilter);
             const matchesFeatured = !featuredFilter || event.featured || event.recurring;
             const matchesTimeFilter = showPastEvents || eventDate > now;
             
@@ -1235,7 +1235,7 @@ class CubanSocialApp {
                 price: eventData.price,
                 description: eventData.description,
                 contact: eventData.contact,
-                approved: false,
+                status: 'pending',
                 featured: false,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()

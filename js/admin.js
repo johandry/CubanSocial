@@ -149,7 +149,7 @@ function renderFilteredEvents() {
     
     // Apply status filter (checked = show pending only, unchecked = show all)
     if (statusFilterChecked) {
-        filteredEvents = filteredEvents.filter(event => !event.approved);
+        filteredEvents = filteredEvents.filter(event => event.status !== 'approved');
     }
     
     // Apply date filter (checked = show future only, unchecked = show all)
@@ -164,8 +164,8 @@ function renderFilteredEvents() {
     console.log(`Showing ${filteredEvents.length} events (pending only: ${statusFilterChecked}, future only: ${dateFilterChecked})`);
     
     // Update count display
-    const pendingCount = allEvents.filter(event => !event.approved).length;
-    const approvedCount = allEvents.filter(event => event.approved).length;
+    const pendingCount = allEvents.filter(event => event.status !== 'approved').length;
+    const approvedCount = allEvents.filter(event => event.status === 'approved').length;
     updateEventCount(allEvents.length, pendingCount, approvedCount);
     
     if (filteredEvents.length === 0) {
@@ -218,13 +218,13 @@ function renderEventRow(event, index, container) {
             </div>
             <div class="col-date">${eventDate}</div>
             <div class="col-status">
-                <span class="status-badge ${event.approved ? 'approved' : 'pending'}">
-                    ${event.approved ? '✅ Approved' : '⏳ Pending'}
+                <span class="status-badge ${event.status === 'approved' ? 'approved' : 'pending'}">
+                    ${event.status === 'approved' ? '✅ Approved' : '⏳ Pending'}
                 </span>
             </div>
             <div class="col-actions">
                 <button class="btn-open" title="View Details">👁️ Open</button>
-                ${!event.approved ? '<button class="btn-approve" title="Approve Event">✅</button>' : ''}
+                ${event.status !== 'approved' ? '<button class="btn-approve" title="Approve Event">✅</button>' : ''}
                 <button class="btn-delete" title="Delete Event">🗑️</button>
             </div>
         </div>
@@ -288,7 +288,7 @@ function setupRowEventListeners(eventRow, event) {
     if (approveBtn) {
         approveBtn.onclick = async (e) => {
             e.stopPropagation();
-            await supabase.from('events').update({ approved: true }).eq('id', event.id);
+            await supabase.from('events').update({ status: 'approved' }).eq('id', event.id);
             loadEvents();
         };
     }
@@ -341,8 +341,8 @@ function loadEventDetails(event, detailsContainer) {
                 <h4>Status & Timestamps</h4>
                 <div class="detail-row">
                     <strong>Status:</strong> 
-                    <span class="status-badge ${event.approved ? 'approved' : 'pending'}">
-                        ${event.approved ? '✅ Approved' : '⏳ Pending Approval'}
+                    <span class="status-badge ${event.status === 'approved' ? 'approved' : 'pending'}">
+                        ${event.status === 'approved' ? '✅ Approved' : '⏳ Pending Approval'}
                     </span>
                 </div>
                 <div class="detail-row">
@@ -367,7 +367,7 @@ function loadEventDetails(event, detailsContainer) {
         ` : ''}
         
         <div class="detail-actions">
-            ${!event.approved ? '<button class="approve-btn">✅ Approve Event</button>' : '<button class="unapprove-btn">❌ Unapprove</button>'}
+            ${event.status !== 'approved' ? '<button class="approve-btn">✅ Approve Event</button>' : '<button class="unapprove-btn">❌ Unapprove</button>'}
             <button class="feature-btn">${event.featured ? '⭐ Unfeature' : '⭐ Feature Event'}</button>
             <button class="edit-btn">✏️ Edit</button>
             <button class="delete-btn">🗑️ Delete</button>
@@ -385,8 +385,8 @@ function setupDetailActionButtons(container, event) {
     const approveBtn = container.querySelector('.approve-btn, .unapprove-btn');
     if (approveBtn) {
         approveBtn.onclick = async () => {
-            const newApprovalStatus = !event.approved;
-            await supabase.from('events').update({ approved: newApprovalStatus }).eq('id', event.id);
+            const newStatus = event.status === 'approved' ? 'pending' : 'approved';
+            await supabase.from('events').update({ status: newStatus }).eq('id', event.id);
             loadEvents();
         };
     }
@@ -431,8 +431,8 @@ function renderEventCard(event, index) {
         <div class="event-header">
             <h3>${event.name || 'Unnamed Event'}</h3>
             <div class="approval-status">
-                <span class="status-badge ${event.approved ? 'approved' : 'pending'}">
-                    ${event.approved ? '✅ Approved' : '⏳ Pending Approval'}
+                <span class="status-badge ${event.status === 'approved' ? 'approved' : 'pending'}">
+                    ${event.status === 'approved' ? '✅ Approved' : '⏳ Pending Approval'}
                 </span>
                 ${event.featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
             </div>
@@ -478,7 +478,7 @@ function renderEventCard(event, index) {
         </div>
         
         <div class="event-actions">
-            ${!event.approved ? '<button class="approve-btn">✅ Approve Event</button>' : '<button class="unapprove-btn">❌ Unapprove</button>'}
+            ${event.status !== 'approved' ? '<button class="approve-btn">✅ Approve Event</button>' : '<button class="unapprove-btn">❌ Unapprove</button>'}
             <button class="feature-btn">${event.featured ? '⭐ Unfeature' : '⭐ Feature Event'}</button>
             <button class="edit-btn">✏️ Edit</button>
             <button class="delete-btn">🗑️ Delete</button>
@@ -490,8 +490,8 @@ function renderEventCard(event, index) {
     const approveBtn = eventDiv.querySelector('.approve-btn, .unapprove-btn');
     if (approveBtn) {
         approveBtn.onclick = async () => {
-            const newApprovalStatus = !event.approved;
-            await supabase.from('events').update({ approved: newApprovalStatus }).eq('id', event.id);
+            const newStatus = event.status === 'approved' ? 'pending' : 'approved';
+            await supabase.from('events').update({ status: newStatus }).eq('id', event.id);
             loadEvents(); // Reload to update the data
         };
     }
@@ -586,10 +586,12 @@ function showEditForm(eventDiv, event) {
                 <div class="edit-section-group">
                     <h4>Status & Settings</h4>
                     <div class="form-group">
-                        <label>
-                            <input type="checkbox" name="approved" ${event.approved ? 'checked' : ''}> 
-                            Approved
-                        </label>
+                        <label>Status:</label>
+                        <select name="status">
+                            <option value="pending" ${event.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="approved" ${event.status === 'approved' ? 'selected' : ''}>Approved</option>
+                            <option value="rejected" ${event.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>
@@ -631,7 +633,7 @@ function showEditForm(eventDiv, event) {
             price: formData.get('price'),
             contact: formData.get('contact'),
             description: formData.get('description'),
-            approved: formData.has('approved'),
+            status: formData.get('status'),
             featured: formData.has('featured'),
             updated_at: new Date().toISOString()
         };
