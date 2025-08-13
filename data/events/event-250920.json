@@ -5,7 +5,9 @@
   "end_date": "2025-09-20T22:00:00",
   "location": "Adams Avenue Street Fair, Adams Avenue San Diego, CA 92116",
   "maps_link": "https://maps.app.goo.gl/7wTxRpgZz6d2gMV1A",
-  "type": ["salsa"],
+  "type": [
+    "salsa"
+  ],
   "music": "Live",
   "price": "Free",
   "event_url": "https://www.sabrosaslatinorchestra.com/upcoming-events/092025-adams-avenue-street-fair",
@@ -13,5 +15,6 @@
   "description": "Join us for a night of live salsa music and dancing at the Adams Avenue Street Fair! Celebrate the vibrant culture of Latin music and dance.",
   "contact": "@sabrosaslatinorchestra",
   "featured": true,
-  "created_at": "2025-07-20T11:30:00Z"
+  "created_at": "2025-07-20T11:30:00Z",
+  "status": "approved"
 }

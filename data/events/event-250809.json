@@ -5,7 +5,11 @@
   "end_date": "2025-08-10T00:00:00",
   "location": "Queen Bee's Art and Cultural Center, 3925 Ohio St, San Diego, CA 92104",
   "maps_link": "https://maps.app.goo.gl/w3h6ecmAXScHFbUk9",
-  "type": ["bachata", "timba", "rueda"],
+  "type": [
+    "bachata",
+    "timba",
+    "rueda"
+  ],
   "music": "DJ",
   "price": "Free",
   "event_url": "https://www.evite.com/event/023B3ERAVGL5YY4EMEPQMG7Q3774FY",
@@ -13,5 +17,6 @@
   "description": "Let's celebrate Leo's birthday with a special bachata and timba night! Join us for a fun evening of dancing, drinks, and community.",
   "contact": "@cubansocial.sd",
   "featured": true,
-  "created_at": "2025-07-27T09:00:00Z"
+  "created_at": "2025-07-27T09:00:00Z",
+  "status": "approved"
 }

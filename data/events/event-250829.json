@@ -5,11 +5,15 @@
   "end_date": "2025-08-30T01:00:00",
   "location": "El Flow, 9474 Black Mountain Rd Suites B & D, San Diego, CA 92126",
   "maps_link": "https://maps.app.goo.gl/ss4xctY2nf7fpK5s7",
-  "type": ["salsa", "bachata"],
+  "type": [
+    "salsa",
+    "bachata"
+  ],
   "music": "DJ",
   "price": "$15",
   "description": "Celebrate Anacristina's birthday with a night of salsa and bachata dancing! Join us for a fun evening filled with music, dancing, and celebration.",
   "contact": "@cubansocial.sd",
   "featured": false,
-  "created_at": "2025-07-20T11:30:00Z"
+  "created_at": "2025-07-20T11:30:00Z",
+  "status": "approved"
 }
