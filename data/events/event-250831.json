@@ -1,0 +1,20 @@
+{
+  "id": "event-250831",
+  "name": "Salsa",
+  "date": "2025-08-31T12:00:00",
+  "end_date": "2025-08-31T16:00:00",
+  "location": "Palomar Winery, 33820 Rancho California Rd. Temecula, CA 92591",
+  "maps_link": "https://maps.google.com/?q=Palomar%20Winery%2C%2033820%20Rancho%20California%20Rd.%20Temecula%2C%20CA%2092591",
+  "type": [
+    "salsa",
+    "bachata"
+  ],
+  "music": "Live",
+  "price": "Free",
+  "description": "Usually on Fridays, but it's Labor Day Special",
+  "featured": false,
+  "created_at": "2025-08-28T22:33:52.558Z",
+  "event_url": "http://mountpalomarwinery.com/events",
+  "recurring": "false",
+  "status": "pending"
+}
