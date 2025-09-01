@@ -14,6 +14,6 @@
   "contact": "@619 251-8863",
   "featured": false,
   "created_at": "2025-09-01T16:39:50.470Z",
-  "recurring": "false",
+  "recurring": false,
   "status": "pending"
 }
