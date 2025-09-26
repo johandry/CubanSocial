@@ -1,0 +1,20 @@
+{
+  "id": "event-251004",
+  "name": "Dance Party at Rosa Beatriz’s House",
+  "date": "2025-10-04T16:00:00",
+  "end_date": "2025-10-04T22:00:00",
+  "location": "South Carlsbad, addresses will be shared with confirmed attendees",
+  "maps_link": "https://maps.google.com/?q=South%20Carlsbad%2C%20addresses%20will%20be%20shared%20with%20confirmed%20attendees",
+  "type": [
+    "timba",
+    "rueda"
+  ],
+  "music": "DJ",
+  "price": "Free",
+  "description": "Potluck and BYOB  Get ready to dance!",
+  "contact": "@(954) 632-5592",
+  "featured": false,
+  "created_at": "2025-09-24T23:05:33.168Z",
+  "recurring": "false",
+  "status": "pending"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "event-251011",
+  "name": "Octoberfest at Esther and Julio's home",
+  "date": "2025-10-11T17:00:00",
+  "location": "Esther and Julio's home - Exact address will be provided",
+  "maps_link": "https://maps.google.com/?q=Esther%20and%20Julio's%20home%20-%20Exact%20address%20will%20be%20provided",
+  "type": [
+    "timba",
+    "rueda"
+  ],
+  "music": "DJ",
+  "price": "Free",
+  "description": "Potluck, BYOB",
+  "contact": "@760 407-4234",
+  "featured": false,
+  "created_at": "2025-09-25T22:18:08.686Z",
+  "recurring": "false",
+  "status": "pending"
+}
