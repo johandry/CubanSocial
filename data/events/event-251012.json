@@ -1,0 +1,18 @@
+{
+  "id": "event-251012",
+  "name": "House Party at Pepe & Marianne's",
+  "date": "2025-10-12T16:00:00",
+  "location": "Pepe & Marianne's at Rancho Bernardo",
+  "maps_link": "https://maps.app.goo.gl/d3YSN6dh2GS63FHDA",
+  "type": [
+    "timba",
+    "bachata",
+    "rueda"
+  ],
+  "music": "Mixed",
+  "price": "Free",
+  "description": "House Party at Pepe&Marianne's with DJ and Live Music. BBQ and potluck.",
+  "featured": false,
+  "created_at": "2025-09-28T03:53:42.073Z",
+  "status": "pending"
+}
