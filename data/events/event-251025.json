@@ -1,19 +1,17 @@
 {
   "id": "event-251025",
-  "name": "Dance Halloween Party at Cardiff",
+  "name": "Halloween Party at Esther & Julio's",
   "date": "2025-10-25T17:00:00",
-  "end_date": "2025-10-25T23:00:00",
-  "location": "Ana & Marshall's Backyard at Cardiff",
-  "maps_link": "https://maps.app.goo.gl/3N2WmNVcWHAXQrAA9",
+  "location": "Esther & Julio's at Escondido",
+  "maps_link": "https://maps.app.goo.gl/yKLXY1XMawEvSobMA",
   "type": [
     "timba",
-    "bachata",
     "rueda"
   ],
   "music": "DJ",
-  "price": "Free",
-  "description": "Costumes highly encouraged  Barbecue, Potluck + BYOB",
-  "contact": "@arcarder@gmail.com",
+  "price": "Potluck",
+  "description": "DJ Byron. Costumes highly encouraged. Barbecue, Potluck + BYOB.",
+  "contact": "@760 407-4234",
   "featured": false,
   "created_at": "2025-09-25T22:28:51.326Z",
   "status": "pending"

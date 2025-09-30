@@ -1,6 +1,6 @@
 {
   "id": "event-251004",
-  "name": "Dance Party at Rosa Beatriz's House",
+  "name": "Toga Party at Rosa Beatriz's House",
   "date": "2025-10-04T16:00:00",
   "end_date": "2025-10-04T22:00:00",
   "location": "Rosa Beatriz's at South Carlsbad",
@@ -11,7 +11,7 @@
   ],
   "music": "DJ",
   "price": "Potluck",
-  "description": "Potluck and BYOB. Get ready to dance!",
+  "description": "Bring your toga, it's a Greek theme party. Potluck and BYOB. Get ready to dance!",
   "contact": "@(954) 632-5592",
   "featured": false,
   "created_at": "2025-09-24T23:05:33.168Z",
