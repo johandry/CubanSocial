@@ -1,8 +1,8 @@
 {
   "id": "mallorca2025",
   "name": "Cubason Congress 2025",
-  "date": "2025-10-30",
-  "end_date": "2025-11-02",
+  "date": "2025-10-30T00:00:00+02:00",
+  "end_date": "2025-11-02T23:59:59+02:00",
   "location": "Palma de Mallorca, Spain",
   "maps_link": "https://maps.google.com/?q=Palma+de+Mallorca",
   "description": "A gathering for the soul, where Cuban music beats strongly in the heart of the Mediterranean. Cubason Congress returns to Mallorca with a truly memorable edition. After leaving a lasting impact in New Orleans and Playa del Carmen, we return with more richness, more tradition, and a deep respect for Cuba’s rich musical and dance legacy.",
