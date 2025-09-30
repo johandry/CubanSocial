@@ -59,10 +59,15 @@ class CubanSocialApp {
             await this.loadMonthlyCards();
             this.setupCarousel();
             
-            // Initialize with Landing section active
-            console.log('About to show Landing section');
-            this.showSection('landing');
-            this.setActiveNavLink('landing');
+            // Initialize with Landing section active only if no section is currently visible
+            const currentlyVisibleSection = document.querySelector('.section[style*="block"], .events-section[style*="block"], .landing-section[style*="block"]');
+            if (!currentlyVisibleSection) {
+                console.log('No section currently visible, showing Landing section');
+                this.showSection('landing');
+                this.setActiveNavLink('landing');
+            } else {
+                console.log('A section is already visible, skipping default landing section');
+            }
             console.log('Initialization complete');
         } catch (error) {
             console.error('Error during initialization:', error);
