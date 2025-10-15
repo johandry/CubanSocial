@@ -5,17 +5,17 @@
 __pycache__/
 *.pyc
 .venv/
+.qr_venv/
 node_modules/
-npm-debug.log
-yarn-error.log
+*.log
 package-lock.json
-yarn.lock
 
 # IDE and editor files
 .idea/
 .vscode/
 *.swp
 *.swo
+.hintrc
 
 # Build output
 dist/
