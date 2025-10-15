@@ -93,7 +93,7 @@ All commands are now managed through the Makefile. Run `make help` for the compl
 
 `supabase-to-json.js` downloads all approved events from the Supabase database and saves them as individual JSON files in the `data/events/` directory. This maintains compatibility with the existing file-based system while keeping data synchronized with the database.
 
-### Usage
+### Export Script Usage
 
 ```bash
 make export-events
@@ -101,7 +101,7 @@ make export-events
 node scripts/supabase-to-json.js
 ```
 
-### Features
+### Export Script Features
 
 - Downloads only approved events from Supabase
 - Maintains existing JSON file structure and formatting
@@ -111,7 +111,7 @@ node scripts/supabase-to-json.js
 - Generates appropriate filenames based on event dates (format: `event-YYMMDD.json`)
 - Provides detailed summary of export results
 
-### Output
+### Export Script Output
 
 - Individual event JSON files in `data/events/` directory
 - Updated `data/events/index.json` with file listing
@@ -121,7 +121,7 @@ node scripts/supabase-to-json.js
 
 `insert-missing-events.py` inserts events from JSON files that are missing in the Supabase database. This is useful after running the data comparison script and finding events that exist only in JSON files.
 
-### Usage
+### Import Script Usage
 
 ```bash
 make insert-missing-events        # With confirmation prompt
@@ -133,12 +133,12 @@ python3 scripts/insert-missing-events.py --dry-run
 python3 scripts/insert-missing-events.py --force
 ```
 
-### Prerequisites
+### Import Script Prerequisites
 
 - Python package `supabase-py`
 - JSON event files in `data/events/` directory
 
-### Features
+### Import Script Features
 
 - Compares JSON files with Supabase database to identify missing events
 - Shows preview of events to be inserted before proceeding
@@ -150,7 +150,7 @@ python3 scripts/insert-missing-events.py --force
 - Validates required fields before insertion
 - Sets appropriate created_at timestamps
 
-### Command Options
+### Import Command Options
 
 | Flag | Description |
 |------|-------------|
@@ -159,7 +159,7 @@ python3 scripts/insert-missing-events.py --force
 | `--verbose, -v` | Show detailed output |
 | `--help, -h` | Show help message |
 
-### Environment Variables
+### Import Environment Variables
 
 | Variable | Description |
 |----------|-------------|
@@ -173,7 +173,7 @@ DEBUG=true make insert-missing-events
 DEBUG=true python3 scripts/insert-missing-events.py --dry-run
 ```
 
-### Output
+### Import Script Output
 
 - Inserts missing events into Supabase database with **'pending' status** for manual review
 - Console output showing insertion progress and results
@@ -192,7 +192,7 @@ The script will:
 2. Group events by month and generate a card for each month with events
 3. Save cards as PNG files in `data/cards/`
 
-### Usage
+### Card Generator Usage
 
 ```bash
 make cards
@@ -202,7 +202,7 @@ node scripts/generate-event-cards.js
 node scripts/list-cards.js
 ```
 
-### Features
+### Card Generator Features
 
 - Automatic month color scheme rotation
 - Spanish month names and day names
@@ -212,7 +212,7 @@ node scripts/list-cards.js
 - Rounded corners and modern design
 - Automatically generates cards from approved events in the Supabase database
 
-### Output
+### Card Generator Output
 
 - Images are saved to `data/cards/` directory
 - Filename format: `events-YYYY-MM.png`
@@ -255,7 +255,7 @@ node scripts/list-cards.js
 
 `json_to_csv.py` converts JSON event files to CSV format for analysis and comparison.
 
-#### Usage
+#### Conversion Script Usage
 
 ```bash
 make json-to-csv
@@ -263,7 +263,7 @@ make json-to-csv
 python3 scripts/json_to_csv.py
 ```
 
-#### Features
+#### Conversion Script Features
 
 - Converts all event JSON files in `data/events/` to a single CSV file
 - Preserves key event fields: date, time, location, type, and status
@@ -272,7 +272,7 @@ python3 scripts/json_to_csv.py
 - Outputs timestamped CSV files (format: `events_YYYYMMDD_HHMMSS.csv`)
 - Provides summary of conversion results and any errors encountered
 
-#### Output
+#### Conversion Script Output
 
 - CSV file containing all event data in the project root
 - Columns include: `id`, `name`, `date`, `end_date`, `location`, `type`, `status`, and other relevant fields
@@ -282,7 +282,7 @@ python3 scripts/json_to_csv.py
 
 `compare-csv.py` compares events data between Supabase database export (CSV) and JSON files to identify discrepancies.
 
-#### Usage
+#### Comparison Script Usage
 
 ```bash
 make compare-data
@@ -292,7 +292,7 @@ python3 scripts/compare-csv.py
 python3 scripts/compare-csv.py --verbose
 ```
 
-#### Features
+#### Comparison Script Features
 
 - Compares event data between Supabase CSV export (`events_rows.csv`) and latest JSON-to-CSV output
 - Identifies missing, extra, or mismatched events in either source
@@ -302,13 +302,13 @@ python3 scripts/compare-csv.py --verbose
 - Shows field-level analysis in verbose mode
 - Outputs detailed comparison report to console
 
-#### Command Options
+#### Comparison Command Options
 
 | Flag | Description |
 |------|-------------|
 | `--verbose, -v` | Show detailed field analysis and comparison |
 
-#### Output
+#### Comparison Script Output
 
 - Console output with comprehensive comparison results:
   - Events in DB but not in JSON files
@@ -319,7 +319,7 @@ python3 scripts/compare-csv.py --verbose
 
 ## Development Server
 
-### Usage
+### Development Server Usage
 
 ```bash
 make start
@@ -329,7 +329,7 @@ make server
 
 This starts a Python HTTP server on port 8000, serving the application at `http://localhost:8000`.
 
-### Features
+### Development Server Features
 
 - Simple HTTP server for local development
 - Serves static files and allows AJAX requests
@@ -366,7 +366,7 @@ pip install supabase       # Install required packages
 ### Common Issues
 
 1. **Missing CSV files**: Export the events table from Supabase first
-2. **Python import errors**: 
+2. **Python import errors**:
    - Make sure you've activated the virtual environment: `source .venv/bin/activate`
    - Install required packages: `pip install supabase`
 3. **Permission errors**: Ensure write permissions for `data/` directories

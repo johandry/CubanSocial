@@ -102,6 +102,7 @@ All development tasks are managed through the Makefile. Run `make help` to see a
 ### Quick Start Workflow
 
 **Complete setup from scratch:**
+
 ```bash
 git clone https://github.com/johandry/CubanSocial.git
 cd CubanSocial
