@@ -2,7 +2,6 @@
   "id": "event-250906",
   "name": "Havana Nights",
   "date": "2025-09-06T17:00:00",
-  "end_date": "2025-09-06T23:59:00",
   "location": "Más Movimiento Latin Dance Company, 27309 Jefferson Ave A-101, Temecula, CA 92590",
   "maps_link": "https://maps.app.goo.gl/fZyWbATpGnd3QpHx5",
   "type": [
@@ -11,11 +10,14 @@
   ],
   "music": "DJ",
   "price": "$25",
-  "event_url": "https://checkout.square.site/merchant/DE630Q2HEHR0T/checkout/RQQHQSPRWJRH7I62YXW2VXQB",
-  "event_url_text": "Buy Tickets",
   "description": "Immerse yourself in the essence of Cuba at Havana Nights, a captivating all Cuban event filled with the spirit of the Caribbean.",
   "contact": "@951-421-8777",
   "featured": false,
-  "created_at": "2025-07-29T22:42:04.183Z",
-  "status": "approved"
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2025-07-29T22:42:04.183+00:00",
+  "updated_at": "2025-08-13T06:39:15.680537+00:00",
+  "end_date": "2025-09-06T23:59:00",
+  "event_url": "https://checkout.square.site/merchant/DE630Q2HEHR0T/checkout/RQQHQSPRWJRH7I62YXW2VXQB",
+  "event_url_text": "Buy Tickets"
 }

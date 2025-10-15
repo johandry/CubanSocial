@@ -16,6 +16,8 @@
   "description": "Havana nights at Studio K social with light snacks and drinks and DJ",
   "contact": "@8583442343",
   "featured": false,
-  "created_at": "2025-08-02T13:07:50.153Z",
-  "status": "approved"
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2025-08-02T13:07:50.153+00:00",
+  "updated_at": "2025-10-15T05:26:52.628+00:00"
 }
