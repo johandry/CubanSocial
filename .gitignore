@@ -17,3 +17,7 @@ yarn.lock
 # Build output
 dist/
 build/
+
+# Reports & Temporal files
+*.csv
+data/events/*/*
