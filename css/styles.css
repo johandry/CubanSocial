@@ -1387,6 +1387,7 @@ textarea:focus {
     background: rgba(255, 255, 255, 0.1);
     padding: 32px 24px;
     border-radius: 16px;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -1464,9 +1465,11 @@ textarea:focus {
     padding: 60px 0;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 24px;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
 
+/* Section Title Styles */
 .section-title {
     font-size: 2.25rem;
     font-weight: 700;
@@ -1480,6 +1483,7 @@ textarea:focus {
     margin-right: 12px;
 }
 
+/* Section Description Styles */
 .section-description {
     text-align: center;
     font-size: 1.125rem;
@@ -1490,23 +1494,27 @@ textarea:focus {
     margin-right: auto;
 }
 
+/* Carousel Container */
 .carousel-container {
     position: relative;
     max-width: 1000px;
     margin: 0 auto;
 }
 
+/* Carousel Wrapper */
 .carousel-wrapper {
     overflow: hidden;
     border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
+/* Carousel Track */
 .carousel-track {
     display: flex;
     transition: transform 0.5s ease-in-out;
 }
 
+/* Carousel Slide */
 .carousel-slide {
     min-width: 100%;
     display: flex;
@@ -1516,6 +1524,7 @@ textarea:focus {
     background: white;
 }
 
+/* Carousel Image */
 .carousel-slide img {
     max-width: 100%;
     max-height: 600px;
@@ -1529,6 +1538,7 @@ textarea:focus {
     transform: scale(1.02);
 }
 
+/* Carousel Button */
 .carousel-btn {
     position: absolute;
     top: 50%;
@@ -1561,6 +1571,7 @@ textarea:focus {
     right: -25px;
 }
 
+/* Carousel Indicators */
 .carousel-indicators {
     display: flex;
     justify-content: center;
@@ -1582,6 +1593,7 @@ textarea:focus {
     transform: scale(1.2);
 }
 
+/* Carousel Info */
 .carousel-info {
     text-align: center;
     margin-top: 32px;
