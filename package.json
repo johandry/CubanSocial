@@ -1,15 +1,20 @@
 {
   "name": "cuban-social",
-  "version": "0.3.0",
-  "description": "Community-driven platform for discovering Cuban dance events in San Diego",
-  "main": "js/app.js",
+  "version": "0.4.0",
+  "description": "Cuban Social - Discover the best Cuban dance events in San Diego",
+  "type": "module",
+  "main": "index.html",
   "scripts": {
-    "start": "python -m http.server 8000",
-    "dev": "python -m http.server 8000",
-    "build": "node scripts/build.js",
+    "start": "python3 -m http.server 8000",
+    "export-events": "node scripts/supabase-to-json.js",
+    "insert-missing-events": "python3 scripts/insert-missing-events.py",
+    "insert-missing-dry-run": "python3 scripts/insert-missing-events.py --dry-run",
+    "insert-missing-force": "python3 scripts/insert-missing-events.py --force",
     "generate-cards": "node scripts/generate-event-cards.js",
-    "deploy": "gh-pages -d .",
-    "list-cards": "node scripts/list-cards.js"
+    "list-cards": "node scripts/list-cards.js",
+    "json-to-csv": "python3 scripts/json_to_csv.py",
+    "compare-data": "python3 scripts/compare-csv.py",
+    "compare-data-verbose": "python3 scripts/compare-csv.py --verbose"
   },
   "repository": {
     "type": "git",
