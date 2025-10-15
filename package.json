@@ -2,7 +2,6 @@
   "name": "cuban-social",
   "version": "0.4.0",
   "description": "Cuban Social - Discover the best Cuban dance events in San Diego",
-  "type": "module",
   "main": "index.html",
   "repository": {
     "type": "git",

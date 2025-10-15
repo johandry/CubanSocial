@@ -1,7 +1,10 @@
 # macOS system files
 .DS_Store
 
-# Node.js
+# Node.js and Python artifacts
+__pycache__/
+*.pyc
+.venv/
 node_modules/
 npm-debug.log
 yarn-error.log
@@ -17,7 +20,5 @@ yarn.lock
 # Build output
 dist/
 build/
-
-# Reports & Temporal files
 *.csv
 data/events/*/*
