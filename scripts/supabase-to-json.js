@@ -40,6 +40,33 @@ async function loadEventsFromSupabase() {
 }
 
 /**
+ * Adjust datetime by subtracting 7 hours (UTC to Pacific Time)
+ * Returns format: YYYY-MM-DDTHH:mm:ss (without milliseconds or timezone)
+ */
+function adjustDateForTimezone(dateString) {
+    if (!dateString) return null;
+    
+    try {
+        const date = new Date(dateString);
+        
+        // Build the formatted date string manually
+        const parts = {
+            year: date.getFullYear(),
+            month: (date.getMonth() + 1).toString().padStart(2, '0'),
+            day: date.getDate().toString().padStart(2, '0'),
+            hour: date.getHours().toString().padStart(2, '0'),
+            minute: date.getMinutes().toString().padStart(2, '0'),
+            second: date.getSeconds().toString().padStart(2, '0')
+        };
+        
+        return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
+    } catch (error) {
+        console.warn(`⚠️  Could not adjust date: ${dateString}`, error);
+        return dateString;
+    }
+}
+
+/**
  * Transform Supabase event data to match existing JSON file structure
  */
 function transformEventToJSONFormat(event) {
@@ -47,7 +74,7 @@ function transformEventToJSONFormat(event) {
     return {
         id: event.id,
         name: event.name,
-        date: event.date,
+        date: adjustDateForTimezone(event.date),
         location: event.location,
         maps_link: event.maps_link || "",
         type: Array.isArray(event.type) ? event.type : [event.type],
@@ -61,7 +88,7 @@ function transformEventToJSONFormat(event) {
         created_at: event.created_at,
         updated_at: event.updated_at,
         // Include optional fields if they exist
-        ...(event.end_date && { end_date: event.end_date }),
+        ...(event.end_date && { end_date: adjustDateForTimezone(event.end_date) }),
         ...(event.event_url && { event_url: event.event_url }),
         ...(event.event_url_text && { event_url_text: event.event_url_text }),
         ...(event.payment_link && { payment_link: event.payment_link }),
@@ -305,5 +332,6 @@ export {
     loadEventsFromSupabase,
     transformEventToJSONFormat,
     saveEventsToJSONFiles,
-    updateIndexFile
+    updateIndexFile,
+    adjustDateForTimezone
 };

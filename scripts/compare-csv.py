@@ -6,7 +6,7 @@ Script to compare events_rows.csv (Supabase export) with JSON-to-CSV output.
 import csv
 import sys
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 
@@ -25,8 +25,13 @@ def load_csv(file_path):
         return []
 
 
-def normalize_datetime(dt_str):
-    """Normalize datetime strings for comparison."""
+def normalize_datetime(dt_str, adjust_timezone=False):
+    """Normalize datetime strings for comparison.
+    
+    Args:
+        dt_str: datetime string to normalize
+        adjust_timezone: if True, subtract 7 hours from DB datetime (UTC to Pacific Time)
+    """
     if not dt_str:
         return ""
     
@@ -37,6 +42,16 @@ def normalize_datetime(dt_str):
     # Truncate to just the main datetime part (remove microseconds if present)
     if "." in dt_str:
         dt_str = dt_str.split(".")[0]
+    
+    # Adjust for timezone offset if needed (DB is UTC, JSON is Pacific Time)
+    if adjust_timezone and dt_str:
+        try:
+            dt = datetime.fromisoformat(dt_str)
+            # Subtract 7 hours to convert from UTC to Pacific Time for comparison
+            dt = dt - timedelta(hours=7)
+            dt_str = dt.isoformat()
+        except:
+            pass  # If parsing fails, return original
     
     return dt_str
 
@@ -72,7 +87,7 @@ def normalize_array(array_str):
     return [array_str.strip()] if array_str.strip() else []
 
 
-def compare_events(db_events, json_events):
+def compare_events(db_events, json_events, verbose=False):
     """Compare events from database export vs JSON files."""
     print("\n" + "="*80)
     print("COMPARISON REPORT")
@@ -112,26 +127,40 @@ def compare_events(db_events, json_events):
         
         event_diffs = []
         
-        # Compare key fields
+        # Compare key fields (always compared)
         comparison_fields = [
-            ('name', str, str),
-            ('date', normalize_datetime, normalize_datetime),
-            ('end_date', normalize_datetime, normalize_datetime),
-            ('location', str, str),
-            ('maps_link', str, str),
-            ('type', normalize_array, normalize_array),
-            ('music', str, str),
-            ('price', str, str),
-            ('description', str, str),
-            ('contact', str, str),
-            ('featured', normalize_boolean, normalize_boolean),
-            ('status', str, str),
-            ('created_at', normalize_datetime, normalize_datetime),
-            ('event_url', str, str),
-            ('event_url_text', str, str)
+            ('name', str, str, False),
+            ('date', lambda x: normalize_datetime(x, adjust_timezone=True), 
+                     normalize_datetime, True),  # Adjust DB date for timezone
+            ('end_date', lambda x: normalize_datetime(x, adjust_timezone=True), 
+                         normalize_datetime, True),  # Adjust DB date for timezone
+            ('location', str, str, False),
+            ('maps_link', str, str, False),
+            ('type', normalize_array, normalize_array, False),
+            ('music', str, str, False),
+            ('price', str, str, False),
+            ('description', str, str, False),
+            ('contact', str, str, False),
+            ('featured', normalize_boolean, normalize_boolean, False),
+            ('status', str, str, False),
+            ('event_url', str, str, False),
+            ('event_url_text', str, str, False)
         ]
         
-        for field, db_normalizer, json_normalizer in comparison_fields:
+        # Add timestamp fields only in verbose mode
+        if verbose:
+            comparison_fields.extend([
+                ('created_at', normalize_datetime, normalize_datetime, False),
+                ('updated_at', normalize_datetime, normalize_datetime, False)
+            ])
+        
+        for field_info in comparison_fields:
+            if len(field_info) == 4:
+                field, db_normalizer, json_normalizer, is_date = field_info
+            else:
+                field, db_normalizer, json_normalizer = field_info
+                is_date = False
+            
             db_value = db_normalizer(db_event.get(field, ''))
             json_value = json_normalizer(json_event.get(field, ''))
             
@@ -139,7 +168,8 @@ def compare_events(db_events, json_events):
                 event_diffs.append({
                     'field': field,
                     'db_value': db_value,
-                    'json_value': json_value
+                    'json_value': json_value,
+                    'is_date': is_date
                 })
         
         if event_diffs:
@@ -155,7 +185,8 @@ def compare_events(db_events, json_events):
         for event in differences:
             print(f"\n   📅 {event['id']}: {event['name']}")
             for diff in event['diffs']:
-                print(f"      • {diff['field']}:")
+                field_note = " (DB adjusted -7h for Pacific Time)" if diff.get('is_date') else ""
+                print(f"      • {diff['field']}{field_note}:")
                 print(f"        DB:   {repr(diff['db_value'])}")
                 print(f"        JSON: {repr(diff['json_value'])}")
     else:
@@ -171,6 +202,9 @@ def compare_events(db_events, json_events):
     print(f"Events only in DB:             {len(db_only)}")
     print(f"Events only in JSON:           {len(json_only)}")
     print(f"Events with differences:       {len(differences)}")
+    
+    if not verbose:
+        print(f"\n💡 Note: created_at and updated_at are only compared in verbose mode")
     
     return {
         'total_db': len(db_events),
@@ -199,7 +233,7 @@ def main():
     print(f"  JSON-to-CSV:   {json_csv}")
     
     if verbose:
-        print(f"  Verbose mode:  ON")
+        print(f"  Verbose mode:  ON (includes created_at/updated_at)")
     
     # Check if files exist
     if not db_csv.exists():
@@ -231,14 +265,14 @@ def main():
         print(f"  JSON only:    {sorted(json_fields - db_fields)}")
     
     # Compare events
-    results = compare_events(db_events, json_events)
+    results = compare_events(db_events, json_events, verbose)
     
     # Generate timestamp for report
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report_file = project_root / f"comparison_report_{timestamp}.txt"
     
     print(f"\n📄 Detailed report would be saved to: {report_file}")
-    print(f"\n💡 Tip: Use --verbose or -v flag for detailed field analysis")
+    print(f"\n💡 Tip: Use --verbose or -v flag for detailed field analysis and timestamp comparison")
 
 
 if __name__ == "__main__":
