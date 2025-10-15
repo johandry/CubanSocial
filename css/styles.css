@@ -710,23 +710,80 @@ body {
 }
 
 .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--text-color);
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
 }
 
-.form-help {
-    display: block;
-    margin-top: 4px;
+.form-row .form-group:first-child {
+    flex: 2; /* Date field takes more space */
+}
+
+/* Switch group container for dance types */
+.switch-group-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.switch-group-container .switch-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 14px;
-    color: var(--text-light);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Switch styles for dance type checkboxes */
+.filter-switch {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.filter-switch:checked {
+    background: #4CAF50;
+}
+
+.filter-switch::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+}
+
+.filter-switch:checked::before {
+    transform: translateX(20px);
+}
+
+.switch-slider {
+    /* This is handled by the filter-switch styles above */
+    display: none;
+}
+
+/* Form help text */
+.form-group small {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-top: 4px;
 }
 
 input[type="text"],
@@ -1166,6 +1223,58 @@ textarea:focus {
 
 .action-btn.secondary-btn:hover {
     background-color: #218838;
+}
+
+/* Email notification styles */
+.email-link {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.email-link:hover {
+    text-decoration: underline;
+}
+
+.notify-btn {
+    background-color: #0ea5e9;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.notify-btn:hover {
+    background-color: #0284c7;
+}
+
+.notify-btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.notification-container button:hover {
+    opacity: 0.9;
+}
+
+/* Responsive adjustments for notification */
+@media (max-width: 768px) {
+    .notification-container {
+        margin: 10px 0;
+        padding: 15px;
+    }
+    
+    .notification-container > div:last-child {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .notification-container button {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Responsive Design */

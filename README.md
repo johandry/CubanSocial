@@ -2,7 +2,7 @@
 
 > Discover the best Cuban dance events in San Diego
 
-Cuban Social is a community-driven platform for discovering salsa, timba, bachata, merengue, and rueda de casino events in San Diego. Built as a static GitHub Pages site with a unique pull request-based contribution system.
+Cuban Social is a community-driven platform for discovering salsa, timba, bachata, merengue, and rueda de casino events in San Diego. Built as a modern web application with real-time data storage and a unique pull request-based contribution system.
 
 ## 🌟 Features
 
@@ -12,16 +12,65 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 - **📱 Responsive Design**: Mobile-friendly interface for on-the-go event discovery
 - **🔄 Community Contributions**: Submit events via GitHub pull requests
 - **🎯 Admin Review System**: Quality control through GitHub-based review process
+- **⚡ Real-time Updates**: Live event data with instant updates
 
 ## 🏗️ Architecture
 
 ### Tech Stack
 
 - **Frontend**: Vanilla HTML, CSS, JavaScript (ES6+)
-- **Hosting**: GitHub Pages (static site)
-- **Data Storage**: JSON files in `/data` directory
-- **Contribution Method**: GitHub Pull Requests
+- **Database**: Supabase (PostgreSQL with real-time capabilities)
+- **Hosting**: GitHub Pages (static site) + Supabase backend
+- **Data Storage**: Supabase tables with JSON fallback in `/data` directory for legacy systems
+- **Authentication**: Supabase Auth (for admin functions)
+- **Contribution Method**: GitHub Pull Requests + Direct database submissions
 - **CI/CD**: GitHub Actions for validation and deployment
+
+### Database Schema
+
+The application uses Supabase to store event data with the following main tables:
+
+#### Events Table
+
+```sql
+CREATE TABLE events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  date TIMESTAMPTZ NOT NULL,
+  location TEXT NOT NULL,
+  maps_link TEXT,
+  type TEXT[] NOT NULL, -- ['salsa', 'bachata', etc.]
+  music TEXT CHECK (music IN ('Live', 'DJ', 'Mixed')),
+  price TEXT,
+  description TEXT,
+  contact TEXT,
+  featured BOOLEAN DEFAULT false,
+  recurring TEXT CHECK (recurring IN ('weekly', 'monthly', 'biweekly')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  submitted_by TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### Row Level Security (RLS)
+
+```sql
+-- Enable RLS
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+
+-- Public can read approved events
+CREATE POLICY "Public can view approved events" ON events
+  FOR SELECT USING (status = 'approved');
+
+-- Authenticated users can submit events
+CREATE POLICY "Users can submit events" ON events
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- Admins can manage all events
+CREATE POLICY "Admins can manage events" ON events
+  FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+```
 
 ### Directory Structure
 
@@ -31,10 +80,12 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 ├── css/
 │   └── styles.css         # Application styles
 ├── js/
-│   └── app.js             # Main JavaScript application
-├── data/
-│   ├── events/            # Approved events (live)
-│   ├── events-pending/    # Submitted events awaiting approval
+│   ├── app.js             # Main JavaScript application
+│   ├── supabaseClient.js  # Supabase integration
+│   └── admin.js           # Admin database operations
+├── data/                  # JSON fallback data (legacy)
+│   ├── events/            # Approved events (fallback)
+│   ├── events-pending/    # Submitted events (fallback)
 │   ├── playlists/         # Music playlists
 │   └── congresses/        # Dance congress information
 ├── .github/
@@ -54,11 +105,12 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 
 ### For Event Organizers
 
+#### Quick Submit (Recommended)
+
 1. Visit the "Submit Event" section on the website
-2. Fill out the event submission form with complete details
-3. Submit the form to automatically create a GitHub pull request
-4. Admins will be notified and review your submission
-5. Once approved, your event appears on the live site
+2. Fill out the event submission form
+3. Submit directly to the database for immediate review
+4. Admins receive notifications and can approve/reject
 
 ### For Contributors/Developers
 
@@ -69,7 +121,13 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
    cd CubanSocial
    ```
 
-2. Open `index.html` in your browser or serve locally:
+2. Install dependencies (if using build tools):
+
+   ```bash
+   npm install
+   ```
+
+3. Serve locally:
 
    ```bash
    # Using Python 3
@@ -77,14 +135,31 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
    
    # Using Node.js (with http-server)
    npx http-server
-   
-   # Using PHP
-   php -S localhost:8000
    ```
 
-3. Make your changes and submit a pull request
+4. Make your changes and submit a pull request
 
-## � Analytics Setup
+## 🗄️ Database Management
+
+### Supabase Setup
+
+1. **Create Supabase Project**: Visit [supabase.com](https://supabase.com) and create a new project
+
+2. **Run Migrations**: Execute the SQL schema provided above in the Supabase SQL editor
+
+3. **Configure Authentication**:
+   - Enable email authentication
+   - Set up admin roles using Supabase Auth
+
+4. **Set Up Real-time**: Enable real-time subscriptions for the events table
+
+### Backup Strategy
+
+- **Primary**: Supabase automatic backups
+- **Secondary**: Weekly JSON exports to `/data` directory
+- **Tertiary**: GitHub repository history
+
+## 📊 Analytics Setup
 
 Cuban Social includes comprehensive analytics tracking to monitor website usage and user engagement. See `analytics-setup.md` for complete configuration instructions.
 
@@ -95,16 +170,26 @@ Cuban Social includes comprehensive analytics tracking to monitor website usage 
 ### Tracked Events
 
 - Page navigation and user flows
-- Event submissions and success rates
+- Event submissions and success rates (both database and GitHub)
 - Filter usage patterns
 - External link interactions
 - Contact engagement
+- Database query performance
 
-## �📝 Event Submission Process
+## 📝 Event Submission Process
 
-### User Flow
+### Modern Flow (Supabase)
 
 1. **Fill Form**: User completes the event submission form
+2. **Direct Submit**: Form saves event to Supabase with `status: 'pending'`
+3. **Admin Notification**: Admins receive real-time notifications
+4. **Review Process**: Admins use the admin panel to review events
+5. **Approval**: Admin updates `status` to 'approved' or 'rejected'
+6. **Go Live**: Approved events immediately appear on the website
+
+### Legacy Flow (GitHub PR)
+
+1. **Fill Form**: User completes the advanced submission form
 2. **Auto PR Creation**: Form generates a GitHub pull request with event data
 3. **Admin Notification**: Admins receive GitHub notifications
 4. **Review Process**: Admins use the review checklist to validate events
@@ -113,24 +198,57 @@ Cuban Social includes comprehensive analytics tracking to monitor website usage 
 
 ### Event Data Schema
 
-```json
-{
-  "id": "event-001",
-  "name": "Salsa Night at Mango's",
-  "date": "2025-07-25T20:00:00",
-  "location": "Full address with city, state, zip",
-  "maps_link": "https://maps.google.com/?q=...",
-  "type": ["salsa", "bachata"],
-  "music": "Live|DJ|Mixed",
-  "price": "Free|$15|$20-25",
-  "description": "Event description",
-  "contact": "Contact information",
-  "featured": true,
-  "recurring": "weekly|monthly|biweekly"
+```typescript
+interface Event {
+  id: string;
+  name: string;
+  date: string; // ISO 8601 format
+  location: string;
+  maps_link?: string;
+  type: ('salsa' | 'timba' | 'bachata' | 'merengue' | 'rueda')[];
+  music: 'Live' | 'DJ' | 'Mixed';
+  price: string;
+  description: string;
+  contact: string;
+  featured: boolean;
+  recurring?: 'weekly' | 'monthly' | 'biweekly';
+  status: 'pending' | 'approved' | 'rejected';
+  submitted_by?: string;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
 ## 🛠️ Admin Guide
+
+### Admin Panel Features
+
+- **Event Management**: Review, approve, reject, or edit submitted events
+- **Real-time Dashboard**: See pending submissions and site analytics
+- **Bulk Operations**: Approve/reject multiple events at once
+- **Featured Event Management**: Promote events to featured status
+
+### Database Admin Tasks
+
+```sql
+-- View pending events
+SELECT * FROM events WHERE status = 'pending' ORDER BY created_at DESC;
+
+-- Approve an event
+UPDATE events SET status = 'approved', updated_at = NOW() WHERE id = 'event-id';
+
+-- Feature an event
+UPDATE events SET featured = true WHERE id = 'event-id';
+
+-- Get submission statistics
+SELECT 
+  status,
+  COUNT(*) as count,
+  DATE_TRUNC('week', created_at) as week
+FROM events 
+GROUP BY status, week 
+ORDER BY week DESC;
+```
 
 ### Review Checklist
 
@@ -138,68 +256,51 @@ When reviewing event submissions, check:
 
 - [ ] Event name is descriptive and relevant
 - [ ] Date and time are valid and in the future  
-- [ ] Location includes full address and valid Google Maps link
-- [ ] Dance type is accurate (salsa, timba, bachata, merengue, rueda)
+- [ ] Location includes full address
+- [ ] Google Maps link is valid (if provided)
+- [ ] Dance type is accurate and properly categorized
 - [ ] Event appears legitimate (not spam)
 - [ ] Contact information is provided
-- [ ] JSON is properly formatted
+- [ ] No duplicate events exist
 
-### Approval Process
+## 🔒 Security & Privacy
 
-1. **Review**: Check submission against the checklist
-2. **Move File**: Move from `data/events-pending/` to `data/events/`
-3. **Label**: Add `approved` label to PR
-4. **Merge**: Merge PR to make event live
+### Data Protection
 
-### Labels
+- **Row Level Security**: Supabase RLS policies protect sensitive data
+- **Input Validation**: Client and server-side validation for all submissions
+- **Rate Limiting**: Prevent spam submissions
+- **CORS Configuration**: Restrict API access to authorized domains
 
-- `event-submission`: Automatically added to event PRs
-- `pending-review`: Awaiting admin review
-- `approved`: Event approved and ready to merge
-- `needs-revision`: Changes requested
-- `rejected`: Event rejected
-- `spam`: Spam submission
+### Admin Authentication
+
+- **Supabase Auth**: Secure admin authentication
+- **Role-based Access**: Different permission levels for different admin roles
+- **Session Management**: Secure session handling
 
 ## 🎯 Featured Events
 
-Events can be marked as featured or recurring for special visibility:
+Events can be marked as featured or recurring for special visibility through the admin panel or directly in the database:
 
-```json
-{
-  "featured": true,        // Shows in featured section
-  "recurring": "weekly"    // Shows recurrence pattern
-}
+```sql
+UPDATE events 
+SET 
+  featured = true,
+  recurring = 'weekly'
+WHERE id = 'event-id';
 ```
 
 Featured events appear in a special highlighted section at the top of the site.
 
-## 🎵 Music & Playlists
-
-The platform can also feature curated playlists for different dance styles:
-
-```json
-{
-  "id": "timba2025",
-  "name": "Best Timba Tracks 2025",
-  "tracks": [
-    {
-      "title": "Song Title",
-      "artist": "Artist Name",
-      "spotify_url": "...",
-      "youtube_url": "..."
-    }
-  ]
-}
-```
-
 ## 📊 Analytics & Insights
 
-Event organizers and the community can benefit from:
+Enhanced analytics with database integration:
 
-- Event popularity tracking (via GitHub stars/views)
-- Community engagement metrics
-- Geographic distribution of events
-- Dance type preferences
+- **Real-time Metrics**: Live event submission rates
+- **Geographic Analysis**: Event distribution across San Diego
+- **Popularity Tracking**: Most viewed and attended events
+- **Organizer Insights**: Event submission patterns
+- **Performance Monitoring**: Database query performance
 
 ## 🤝 Contributing
 
@@ -209,11 +310,17 @@ We welcome contributions! Here's how you can help:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Test your changes locally
+3. Set up your local Supabase environment
+4. Make your changes and test with both database and fallback modes
 5. Commit your changes (`git commit -m 'Add amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a pull request
+
+### Database Contributions
+
+- Help optimize queries and database schema
+- Contribute to data migration scripts
+- Improve backup and recovery procedures
 
 ### Event Contributions
 
@@ -221,34 +328,30 @@ We welcome contributions! Here's how you can help:
 - Share the platform with event organizers
 - Follow us on social media to stay updated
 
-### Documentation
+## 🔄 Deployment
 
-- Improve this README
-- Add code comments
-- Create user guides
-- Translate content
+### GitHub Pages + Supabase
 
-## 📱 Mobile App Future
+The application deploys as a static site with dynamic database connectivity:
 
-While currently a web application, the architecture supports future mobile app development:
-
-- PWA (Progressive Web App) capabilities
-- React Native/Flutter app using the same data structure
-- Mobile-specific features like push notifications
+1. **Static Assets**: Deployed to GitHub Pages
+2. **Database**: Hosted on Supabase cloud
+3. **Environment Variables**: Configured in GitHub Actions
+4. **Build Process**: Automated via GitHub Actions
 
 ## 🌍 Expansion Plans
 
-The platform is designed for expansion beyond San Diego:
+Database-driven expansion capabilities:
 
-- Multi-city support with city-specific data directories
-- Internationalization (i18n) support
-- Regional admin teams
-- Location-based event discovery
+- **Multi-city Support**: City-specific database partitioning
+- **Scalability**: Supabase's PostgreSQL handles growth
+- **Multi-language**: Database-stored translations
+- **Regional Admin Teams**: Role-based geographic permissions
 
 ## 📞 Contact & Support
 
 - **Website**: [Cuban Social](https://cubansocial.com)
-- **Instagram**: [@CubanSocial.sd](https://www.instagram.com/cubansocial.sd/.sd)
+- **Instagram**: [@CubanSocial.sd](https://www.instagram.com/cubansocial.sd)
 - **Facebook**: [@CubanSocial](https://facebook.com/cubansocial)
 - **TikTok**: [@CubanSocial](https://tiktok.com/@cubansocial)
 - **YouTube**: [@CubanSocial](https://www.youtube.com/@CubanSocial)
@@ -265,6 +368,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Event organizers who keep the culture alive
 - Contributors who help maintain and improve the platform
 - GitHub for providing free hosting and collaboration tools
+- Supabase for the robust backend infrastructure
 
 ---
 
