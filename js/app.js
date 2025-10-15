@@ -1,4 +1,5 @@
 // Cuban Social - Modern Design Application JavaScript
+import { supabase } from './supabaseClient.js';
 
 class CubanSocialApp {
     constructor() {
@@ -76,7 +77,17 @@ class CubanSocialApp {
 
     async loadEvents() {
         try {
-            this.events = await this.loadEventsFromDirectory();
+            // Try to load from API first
+            try {
+                this.events = await this.loadEventsFromAPI();
+                console.log('Successfully loaded events from API');
+            } catch (apiError) {
+                console.warn('API failed, falling back to local data:', apiError.message);
+                // Fallback to local data if API fails
+                this.events = await this.loadEventsFromDirectory();
+                console.log('Successfully loaded events from local directory');
+            }
+            
             // Apply filters instead of copying all events
             this.applyFilters();
         } catch (error) {
@@ -87,20 +98,47 @@ class CubanSocialApp {
         }
     }
 
+    async loadEventsFromAPI() {
+        try {
+            console.log('Loading events from Supabase API...');
+            
+            // Fetch approved events from Supabase
+            const { data: events, error } = await supabase
+                .from('events')
+                .select('*')
+                .eq('status', 'approved')
+                .order('date', { ascending: true });
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
+            console.log(`Loaded ${events?.length || 0} approved events from API`);
+            return events || [];
+        } catch (error) {
+            console.error('Error loading events from API:', error);
+            throw error;
+        }
+    }
+
     async loadEventsFromDirectory() {
         const events = [];
         
         try {
             // Try to load events index file first (if it exists)
-            const indexResponse = await fetch('data/events/index.json');
+            const indexResponse = await fetch('data/eventos/index.json');
             if (indexResponse.ok) {
                 const eventIndex = await indexResponse.json();
                 for (const filename of eventIndex.files) {
                     try {
-                        const response = await fetch(`data/events/${filename}`);
+                        const response = await fetch(`data/eventos/${filename}`);
                         if (response.ok) {
                             const eventData = await response.json();
-                            events.push(eventData);
+                            // Include events that are approved OR don't have status fields (legacy events)
+                            if (eventData.status === 'approved' || !eventData.hasOwnProperty('status')) {
+                                events.push(eventData);
+                            }
                         }
                     } catch (error) {
                         console.warn(`Error loading ${filename}:`, error);
@@ -109,17 +147,27 @@ class CubanSocialApp {
             } else {
                 // Fallback: try to load known event files
                 const eventFiles = [
-                    'event-001.json',
-                    'event-002.json'
-                    // Add more files as they are created
+                    'event-250802.json',
+                    'event-250808.json',
+                    'event-250809.json',
+                    'event-250816.json',
+                    'event-250817.json',
+                    'event-250823.json',
+                    'event-250829.json',
+                    'event-250906.json',
+                    'event-250919.json',
+                    'event-250920.json'
                 ];
                 
                 for (const filename of eventFiles) {
                     try {
-                        const response = await fetch(`data/events/${filename}`);
+                        const response = await fetch(`data/eventos/${filename}`);
                         if (response.ok) {
                             const eventData = await response.json();
-                            events.push(eventData);
+                            // Include events that are approved OR don't have status fields (legacy events)
+                            if (eventData.status === 'approved' || !eventData.hasOwnProperty('status')) {
+                                events.push(eventData);
+                            }
                         } else {
                             console.warn(`Could not load ${filename}: ${response.status}`);
                         }
@@ -129,7 +177,7 @@ class CubanSocialApp {
                 }
             }
         } catch (error) {
-            console.error('Error accessing events directory:', error);
+            console.error('Error accessing eventos directory:', error);
             throw error;
         }
         
@@ -563,10 +611,15 @@ class CubanSocialApp {
         const container = document.getElementById('featured-events');
         if (!container) return;
 
-        const now = new Date();
+        // Get current time in PST/PDT for filtering
+        const nowPST = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
         const featuredEvents = this.events
             .filter(event => event.featured || event.recurring)
-            .filter(event => new Date(event.date) > now) // Only future events
+            .filter(event => {
+                const eventDateUTC = new Date(event.date);
+                const eventDatePST = new Date(eventDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+                return eventDatePST > nowPST; // Only future events in PST/PDT
+            })
             .slice(0, 3); // Show only first 3 featured events
         
         container.innerHTML = featuredEvents.map(event => `
@@ -727,12 +780,13 @@ class CubanSocialApp {
             dayDiv.className = 'calendar-day';
             dayDiv.textContent = day;
 
-            // Check if there are events on this day
+            // Check if there are events on this day - convert UTC dates to PST/PDT for comparison
             const dayEvents = this.filteredEvents.filter(event => {
-                const eventDate = new Date(event.date);
-                return eventDate.getDate() === day && 
-                       eventDate.getMonth() === this.currentMonth && 
-                       eventDate.getFullYear() === this.currentYear;
+                const eventDateUTC = new Date(event.date);
+                const eventDatePST = new Date(eventDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+                return eventDatePST.getDate() === day && 
+                       eventDatePST.getMonth() === this.currentMonth && 
+                       eventDatePST.getFullYear() === this.currentYear;
             });
 
             if (dayEvents.length > 0) {
@@ -782,14 +836,35 @@ class CubanSocialApp {
         const showPastEvents = document.getElementById('past-events-filter')?.checked || false;
         
         const now = new Date();
+        
+        // Get current PST/PDT time for comparison
+        const nowPST = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+        const todayPST = new Date(nowPST.getFullYear(), nowPST.getMonth(), nowPST.getDate());
 
         this.filteredEvents = this.events.filter(event => {
-            const eventDate = new Date(event.date);
+            // Parse UTC date from database
+            const eventDateUTC = new Date(event.date);
+            // Convert to PST/PDT for comparison
+            const eventDatePST = new Date(eventDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+            const eventDayPST = new Date(eventDatePST.getFullYear(), eventDatePST.getMonth(), eventDatePST.getDate());
+            
             const matchesDance = !danceFilter || event.type.includes(danceFilter);
             const matchesMusic = !musicFilter || event.music === musicFilter;
-            const matchesLocation = !locationFilter || event.location.toLowerCase().includes(locationFilter);
+            const matchesLocation = !locationFilter || (event.location || '').toLowerCase().includes(locationFilter);
             const matchesFeatured = !featuredFilter || event.featured || event.recurring;
-            const matchesTimeFilter = showPastEvents || eventDate > now;
+            
+            // Time filter logic using PST/PDT times:
+            // - If showPastEvents is true: show all events
+            // - If showPastEvents is false: show future events OR events happening today in PST/PDT
+            let matchesTimeFilter;
+            if (showPastEvents) {
+                matchesTimeFilter = true; // Show all events
+            } else {
+                // Show events that are:
+                // 1. In the future (eventDatePST > nowPST)
+                // 2. Happening today (eventDayPST equals todayPST)
+                matchesTimeFilter = eventDatePST > nowPST || eventDayPST.getTime() === todayPST.getTime();
+            }
             
             return matchesDance && matchesMusic && matchesLocation && matchesFeatured && matchesTimeFilter;
         });
@@ -850,12 +925,13 @@ class CubanSocialApp {
     }
 
     showDayEvents(day, month, year) {
-        // Get events for the specific day
+        // Get events for the specific day - convert UTC to PST/PDT for comparison
         const dayEvents = this.filteredEvents.filter(event => {
-            const eventDate = new Date(event.date);
-            return eventDate.getDate() === day && 
-                   eventDate.getMonth() === month && 
-                   eventDate.getFullYear() === year;
+            const eventDateUTC = new Date(event.date);
+            const eventDatePST = new Date(eventDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+            return eventDatePST.getDate() === day && 
+                   eventDatePST.getMonth() === month && 
+                   eventDatePST.getFullYear() === year;
         });
 
         if (dayEvents.length === 0) return;
@@ -981,142 +1057,6 @@ class CubanSocialApp {
         document.addEventListener('keydown', handleEscape);
     }
 
-    formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    }
-
-    formatEventTime(dateString, recurring, endDateString) {
-        const startDate = new Date(dateString);
-        
-        if (recurring) {
-            const dayName = startDate.toLocaleDateString('en-US', { weekday: 'long' });
-            const startTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            
-            if (endDateString) {
-                const endDate = new Date(endDateString);
-                const endTime = endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-                return `Every ${dayName}, ${startTime} - ${endTime}`;
-            }
-            
-            return `Every ${dayName}, ${startTime}`;
-        }
-        
-        // For non-recurring events
-        if (endDateString) {
-            const endDate = new Date(endDateString);
-            const startTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            const endTime = endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            
-            // Check if the event spans multiple days
-            const daysDifference = Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
-            
-            // Treat as same day if it's within 24 hours and ends before 6 AM next day
-            const isSameEventDay = daysDifference < 1 && (startDate.toDateString() === endDate.toDateString() || endDate.getHours() < 6);
-            
-            if (!isSameEventDay) {
-                // Multi-day event: show full date range
-                const startDateStr = startDate.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                const endDateStr = endDate.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                return `${startDateStr} ${startTime} - ${endDateStr} ${endTime}`;
-            } else {
-                // Same evening event: show date once, then time range
-                const dateStr = startDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                return `${dateStr}, ${startTime} - ${endTime}`;
-            }
-        }
-        
-        return this.formatDate(dateString);
-    }
-
-    async handleFormSubmission(e) {
-        e.preventDefault();
-        console.log('Form submission started');
-        
-        try {
-            const form = e.target;
-            const formData = new FormData(form);
-            
-            // Validate required fields
-            const requiredFields = ['name', 'date', 'time', 'location', 'maps_link', 'requestor_name', 'requestor_contact'];
-            const missingFields = [];
-            
-            for (const field of requiredFields) {
-                if (!formData.get(field)) {
-                    missingFields.push(field);
-                }
-            }
-            
-            // Additional validation for requestor name and contact
-            const contactInfo = formData.get('requestor_contact');
-            if (contactInfo && contactInfo.trim().length < 5) {
-                this.showError('Please provide a valid contact method (email, phone number, or social media handle)');
-                return;
-            }
-            
-            // Check if contact is an email and if it's valid
-            if (contactInfo.includes('@')) {
-                if (!this.isValidEmail(contactInfo)) {
-                    this.showError('Please provide a valid email address');
-                    return;
-                }
-            }
-            
-            // Check if at least one dance type is selected
-            const danceTypes = formData.getAll('type');
-            if (danceTypes.length === 0) {
-                missingFields.push('dance type');
-            }
-            
-            if (missingFields.length > 0) {
-                this.showError(`Please fill out all required fields: ${missingFields.join(', ')}`);
-                return;
-            }
-            
-            const eventData = this.parseFormData(formData);
-            console.log('Parsed event data:', eventData);
-            
-            // Submit the event and get the response
-            const response = await this.createRequest(eventData);
-            
-            // Track successful event submission
-            this.trackEvent('event_submitted', {
-                event_name: eventData.name || 'Unknown Event',
-                event_date: eventData.date || 'Unknown Date',
-                event_type: Array.isArray(eventData.type) ? eventData.type.join(', ') : eventData.type || 'Unknown Type',
-                request_number: response.request_number
-            });
-            
-            this.showSuccessMessage(response.request_number);
-            form.reset();
-            
-        } catch (error) {
-            console.error('Error submitting event:', error);
-            this.showError('Failed to submit event. Please try again.');
-        }
-    }
-
     parseFormData(formData) {
         const data = {};
         
@@ -1130,13 +1070,21 @@ class CubanSocialApp {
             }
         }
         
-        // Format date and time fields
+        // Format date and time fields - convert PST/PDT to UTC for storage
         if (data.date && data.time) {
-            data.date = `${data.date}T${data.time}:00`;
+            // Create date in PST/PDT timezone and convert to UTC
+            const localDateTime = `${data.date}T${data.time}:00`;
+            const localDate = new Date(localDateTime);
+            
+            // Convert to UTC for database storage
+            data.date = localDate.toISOString();
         }
         
         if (data.date && data.end_time) {
-            data.end_date = `${data.date.split('T')[0]}T${data.end_time}:00`;
+            // Use the same date for end time, convert to UTC
+            const localEndDateTime = `${data.date.split('T')[0]}T${data.end_time}:00`;
+            const localEndDate = new Date(localEndDateTime);
+            data.end_date = localEndDate.toISOString();
         }
         
         // Handle confirmation email checkbox
@@ -1151,18 +1099,66 @@ class CubanSocialApp {
             delete data.recurring_frequency;
         }
         
-        // Add metadata
-        data.id = 'event-' + Date.now();
+        // Store submitter information for database
+        data.submitter_name = data.requestor_name;
+        data.submitter_email = data.requestor_contact;
+        
+        // Generate proper date-based ID like existing events (event-YYMMDD format)
+        data.id = this.generateEventId(data.date);
         data.created_at = new Date().toISOString();
         data.status = 'pending';  // Mark as pending for admin review
         
         return data;
     }
 
+    // Add this new method to generate proper event IDs
+    generateEventId(dateString) {
+        try {
+            if (!dateString) {
+                console.warn('No date provided for ID generation, using timestamp fallback');
+                return 'event-' + Date.now();
+            }
+            
+            // Parse UTC date and convert to PST/PDT for ID generation
+            const eventDate = new Date(dateString);
+            if (isNaN(eventDate.getTime())) {
+                console.warn('Invalid date provided for ID generation, using timestamp fallback');
+                return 'event-' + Date.now();
+            }
+            
+            // Convert to PST/PDT for consistent ID generation
+            const pstDate = new Date(eventDate.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+            
+            // Format as YYMMDD (2-digit year, 2-digit month, 2-digit day)
+            const year = pstDate.getFullYear().toString().slice(-2);
+            const month = (pstDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = pstDate.getDate().toString().padStart(2, '0');
+            
+            const baseId = `event-${year}${month}${day}`;
+            
+            // Check if this ID already exists in our events array
+            // If it does, append a counter to make it unique
+            let finalId = baseId;
+            let counter = 1;
+            
+            while (this.events.some(event => event.id === finalId)) {
+                finalId = `${baseId}-${counter}`;
+                counter++;
+            }
+            
+            console.log(`Generated event ID: ${finalId} for date: ${dateString}`);
+            return finalId;
+            
+        } catch (error) {
+            console.error('Error generating event ID:', error);
+            return 'event-' + Date.now();
+        }
+    }
+
     async createRequest(eventData) {
-        // Real implementation using Formspree
-        console.log('Submitting event request:', eventData);
-        
+        // Supabase implementation
+        console.log('Submitting event request to Supabase:', eventData);
+
         // Create loading indicator
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading-indicator';
@@ -1171,56 +1167,56 @@ class CubanSocialApp {
             margin: 20px 0;
         `;
         loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting your event...';
-        
+
         const form = document.getElementById('event-form');
         if (form) {
             form.appendChild(loadingDiv);
         }
-        
+
         try {
-            // Format the data for better email readability
-            const formattedData = {
-                ...eventData,
-                // Improve email display with formatted date
-                formatted_date: this.formatEventTime(eventData.date, eventData.recurring, eventData.end_date),
-                // Mark as event submission email
-                _subject: `Cuban Social: New Event Submission - ${eventData.name}`,
-                // Add email confirmation flag for Formspree
-                _cc: eventData.send_confirmation ? eventData.requestor_contact : ''
+            // Prepare event data for Supabase
+            const supabaseEvent = {
+                id: eventData.id,
+                name: eventData.name,
+                date: eventData.date,
+                end_date: eventData.end_date || null,
+                location: eventData.location,
+                maps_link: eventData.maps_link,
+                type: eventData.type,
+                music: eventData.music,
+                price: eventData.price,
+                description: eventData.description,
+                contact: eventData.contact,
+                submitter_name: eventData.submitter_name,
+                submitter_email: eventData.submitter_email,
+                status: 'pending',
+                featured: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             };
-            
-            // Use Formspree to send data to admin email
-            const response = await fetch('https://formspree.io/f/xvgqrqqk', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(formattedData)
-            });
-            
-            const result = await response.json();
-            
-            if (!response.ok) {
-                throw new Error('Failed to submit event. ' + (result.error || ''));
+
+            // Insert into Supabase
+            const { data, error } = await supabase.from('events').insert([supabaseEvent]);
+            if (error) {
+                throw new Error('Supabase error: ' + error.message);
             }
-            
+
             // Log the requestor information
-            if (eventData.requestor_name && eventData.requestor_contact) {
-                console.log(`Event submission from: ${eventData.requestor_name} (${eventData.requestor_contact})`);
+            if (eventData.submitter_name && eventData.submitter_email) {
+                console.log(`Event submission from: ${eventData.submitter_name} (${eventData.submitter_email})`);
             }
-            
+
             // Generate request number for confirmation
             const requestNumber = Math.floor(Math.random() * 1000) + 1;
-            console.log('Event submitted successfully:', requestNumber);
-            
+            console.log('Event submitted successfully to Supabase:', requestNumber);
+
             // Remove loading indicator
             loadingDiv.remove();
-            
-            return { 
-                success: true, 
+
+            return {
+                success: true,
                 request_number: requestNumber,
-                message: result.message || 'Submission received'
+                message: 'Submission received'
             };
         } catch (error) {
             console.error('Submission error:', error);
@@ -1797,6 +1793,191 @@ class CubanSocialApp {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    formatDate(dateString) {
+        if (!dateString) return 'No date';
+        
+        try {
+            // Parse as UTC date from database
+            const utcDate = new Date(dateString);
+            
+            // Convert to PST/PDT for display
+            return utcDate.toLocaleDateString('en-US', {
+                timeZone: 'America/Los_Angeles',
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return 'Invalid date';
+        }
+    }
+
+    formatEventTime(dateString, recurring, endDateString) {
+        if (!dateString) return 'No date';
+        
+        try {
+            // Parse UTC dates from database
+            const startDateUTC = new Date(dateString);
+            const startDatePST = new Date(startDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+            
+            if (recurring) {
+                const dayName = startDatePST.toLocaleDateString('en-US', { 
+                    timeZone: 'America/Los_Angeles',
+                    weekday: 'long' 
+                });
+                const startTime = startDatePST.toLocaleTimeString('en-US', { 
+                    timeZone: 'America/Los_Angeles',
+                    hour: 'numeric', 
+                    minute: '2-digit', 
+                    hour12: true 
+                });
+                
+                if (endDateString) {
+                    const endDateUTC = new Date(endDateString);
+                    const endDatePST = new Date(endDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+                    const endTime = endDatePST.toLocaleTimeString('en-US', { 
+                        timeZone: 'America/Los_Angeles',
+                        hour: 'numeric', 
+                        minute: '2-digit', 
+                        hour12: true 
+                    });
+                    return `Every ${dayName}, ${startTime} - ${endTime}`;
+                }
+                
+                return `Every ${dayName}, ${startTime}`;
+            }
+            
+            // For non-recurring events
+            if (endDateString) {
+                const endDateUTC = new Date(endDateString);
+                const endDatePST = new Date(endDateUTC.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+                
+                const startTime = startDatePST.toLocaleTimeString('en-US', { 
+                    timeZone: 'America/Los_Angeles',
+                    hour: 'numeric', 
+                    minute: '2-digit', 
+                    hour12: true 
+                });
+                const endTime = endDatePST.toLocaleTimeString('en-US', { 
+                    timeZone: 'America/Los_Angeles',
+                    hour: 'numeric', 
+                    minute: '2-digit', 
+                    hour12: true 
+                });
+                
+                // Check if the event spans multiple days in PST/PDT
+                const daysDifference = Math.abs(endDatePST.getTime() - startDatePST.getTime()) / (1000 * 60 * 60 * 24);
+                
+                // Treat as same day if it's within 24 hours and ends before 6 AM next day
+                const isSameEventDay = daysDifference < 1 && (startDatePST.toDateString() === endDatePST.toDateString() || endDatePST.getHours() < 6);
+                
+                if (!isSameEventDay) {
+                    // Multi-day event: show full date range in PST/PDT
+                    const startDateStr = startDatePST.toLocaleDateString('en-US', {
+                        timeZone: 'America/Los_Angeles',
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    const endDateStr = endDatePST.toLocaleDateString('en-US', {
+                        timeZone: 'America/Los_Angeles',
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    return `${startDateStr} ${startTime} - ${endDateStr} ${endTime}`;
+                } else {
+                    // Same evening event: show date once, then time range in PST/PDT
+                    const dateStr = startDatePST.toLocaleDateString('en-US', {
+                        timeZone: 'America/Los_Angeles',
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    return `${dateStr}, ${startTime} - ${endTime}`;
+                }
+            }
+            
+            return this.formatDate(dateString);
+        } catch (error) {
+            console.error('Error formatting event time:', error);
+            return 'Invalid date';
+        }
+    }
+
+    async handleFormSubmission(e) {
+        e.preventDefault();
+        console.log('Form submission started');
+        
+        try {
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Validate required fields
+            const requiredFields = ['name', 'date', 'time', 'location', 'maps_link', 'requestor_name', 'requestor_contact'];
+            const missingFields = [];
+            
+            for (const field of requiredFields) {
+                if (!formData.get(field)) {
+                    missingFields.push(field);
+                }
+            }
+            
+            // Additional validation for requestor name and contact
+            const contactInfo = formData.get('requestor_contact');
+            if (contactInfo && contactInfo.trim().length < 5) {
+                this.showError('Please provide a valid contact method (email, phone number, or social media handle)');
+                return;
+            }
+            
+            // Check if contact is an email and if it's valid
+            if (contactInfo && contactInfo.includes('@')) {
+                if (!this.isValidEmail(contactInfo)) {
+                    this.showError('Please provide a valid email address');
+                    return;
+                }
+            }
+            
+            // Check if at least one dance type is selected
+            const danceTypes = formData.getAll('type');
+            if (danceTypes.length === 0) {
+                missingFields.push('dance type');
+            }
+            
+            if (missingFields.length > 0) {
+                this.showError(`Please fill out all required fields: ${missingFields.join(', ')}`);
+                return;
+            }
+            
+            const eventData = this.parseFormData(formData);
+            console.log('Parsed event data:', eventData);
+            
+            // Submit the event and get the response
+            const response = await this.createRequest(eventData);
+            
+            // Track successful event submission
+            this.trackEvent('event_submitted', {
+                event_name: eventData.name || 'Unknown Event',
+                event_date: eventData.date || 'Unknown Date',
+                event_type: Array.isArray(eventData.type) ? eventData.type.join(', ') : eventData.type || 'Unknown Type',
+                request_number: response.request_number
+            });
+            
+            this.showSuccessMessage(response.request_number);
+            form.reset();
+            
+        } catch (error) {
+            console.error('Error submitting event:', error);
+            this.showError('Failed to submit event. Please try again.');
+        }
     }
 }
 

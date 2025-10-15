@@ -1,19 +1,8 @@
 {
   "name": "cuban-social",
-  "version": "0.3.0",
-  "description": "Community-driven platform for discovering Cuban dance events in San Diego",
-  "main": "js/app.js",
-  "scripts": {
-    "start": "python -m http.server 8000",
-    "dev": "python -m http.server 8000",
-    "validate": "node scripts/validate-events.js",
-    "build": "node scripts/build.js",
-    "deploy": "gh-pages -d .",
-    "test": "npm run validate",
-    "convert-event": "node scripts/csv-to-event-json.js",
-    "generate-cards": "node scripts/generate-event-cards.js",
-    "list-cards": "node scripts/list-cards.js"
-  },
+  "version": "0.4.0",
+  "description": "Cuban Social - Discover the best Cuban dance events in San Diego",
+  "main": "index.html",
   "repository": {
     "type": "git",
     "url": "https://github.com/johandry/CubanSocial.git"
@@ -36,14 +25,13 @@
   },
   "homepage": "https://cubansocial.com",
   "devDependencies": {
-    "ajv": "^8.12.0",
-    "ajv-formats": "^2.1.1",
     "gh-pages": "^6.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.54.0",
     "canvas": "^3.1.2"
   }
 }

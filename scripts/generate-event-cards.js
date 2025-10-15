@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const { createCanvas, registerFont, CanvasRenderingContext2D } = require('canvas');
+const { createClient } = require('@supabase/supabase-js');
+
+// Supabase configuration
+const SUPABASE_URL = 'https://blctxghtoucdtyvetsar.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsY3R4Z2h0b3VjZHR5dmV0c2FyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NjM2ODMsImV4cCI6MjA3MDUzOTY4M30.32q6691h1n4Ue_lFXxkaPnzGlz0917C5iljxLFCFDmc';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Color schemes for different months
 const monthColors = {
@@ -196,25 +202,44 @@ function groupEventsByMonth(events) {
     return grouped;
 }
 
+async function loadEventsFromSupabase() {
+    try {
+        console.log('Loading events from Supabase...');
+        
+        // Fetch approved events from Supabase
+        const { data: events, error } = await supabase
+            .from('events')
+            .select('*')
+            .eq('status', 'approved')
+            .order('date', { ascending: true });
+
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
+
+        console.log(`Loaded ${events?.length || 0} approved events from Supabase`);
+        return events || [];
+    } catch (error) {
+        console.error('Error loading events from Supabase:', error);
+        throw error;
+    }
+}
+
 async function generateEventCards() {
-    const eventsDir = path.join(__dirname, '../data/events');
     const cardsDir = path.join(__dirname, '../data/cards');
     
     // Ensure cards directory exists
     if (!fs.existsSync(cardsDir)) {
         fs.mkdirSync(cardsDir, { recursive: true });
     }
+
+    // Load events from Supabase database only
+    const events = await loadEventsFromSupabase();
     
-    // Read events index
-    const indexPath = path.join(eventsDir, 'index.json');
-    const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-    
-    // Load all events
-    const events = [];
-    for (const filename of index.files) {
-        const eventPath = path.join(eventsDir, filename);
-        const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
-        events.push(event);
+    if (events.length === 0) {
+        console.warn('No approved events found in database to generate cards');
+        return;
     }
     
     // Group events by month

@@ -12,7 +12,10 @@
   "music": "Mixed",
   "price": "Free",
   "description": "House Party at Pepe&Marianne's with DJ and Live Music. BBQ and potluck.",
+  "contact": "",
   "featured": false,
-  "created_at": "2025-09-28T03:53:42.073Z",
-  "status": "pending"
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2025-10-06T08:14:13.761+00:00",
+  "updated_at": "2025-10-15T05:29:46.825+00:00"
 }
