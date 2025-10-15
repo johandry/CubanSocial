@@ -1,5 +1,29 @@
 #!/usr/bin/env python3
 
+"""
+Cuban Social QR Code Generator
+
+Setup Instructions:
+1. Create a virtual environment:
+   python3 -m venv .qr_venv
+
+2. Activate the virtual environment:
+   source .qr_venv/bin/activate
+
+3. Install required dependencies:
+   pip install qrcode[pil] pillow
+
+4. Run the script:
+   ./scripts/QR_code.py
+
+5. Deactivate virtual environment when done:
+   deactivate
+
+Required packages:
+- qrcode: For generating QR codes
+- pillow (PIL): For image manipulation
+"""
+
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
 import os

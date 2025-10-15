@@ -30,13 +30,10 @@ clean:
 	@echo "🧹 Cleaning all unnecessary files..."
 	@find . -name ".DS_Store" -type f -delete 2>/dev/null || true
 	@rm -rf node_modules/ 2>/dev/null || true
-	@rm -f npm-debug.log yarn-error.log package-lock.json yarn.lock 2>/dev/null || true
+	@rm -rf .venv/ .qr_venv/ 2>/dev/null || true
+	@rm -f *.log package-lock.json 2>/dev/null || true
 	@rm -rf .idea/ .vscode/ 2>/dev/null || true
-	@find . -name "*.swp" -type f -delete 2>/dev/null || true
-	@find . -name "*.swo" -type f -delete 2>/dev/null || true
-	@rm -rf dist/ build/ 2>/dev/null || true
-	@find . -name "*.csv" -type f -delete 2>/dev/null || true
-	@rm -rf data/events/*/* 2>/dev/null || true
+	@rm -rf dist/ build/ *.csv 2>/dev/null || true
 	@echo "✅ Clean completed - all unnecessary files removed"
 
 # Start local development server
