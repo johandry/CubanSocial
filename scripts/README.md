@@ -61,9 +61,6 @@ make insert-missing-events     # Actual insertion
 
 ```bash
 make cards
-# or individually:
-make generate-cards
-make list-cards
 ```
 
 **Start development server:**
@@ -87,9 +84,7 @@ All commands are now managed through the Makefile. Run `make help` for the compl
 | `make insert-missing-events` | Insert missing events from JSON to Supabase |
 | `make insert-missing-dry-run` | Preview missing events without inserting |
 | `make insert-missing-force` | Insert missing events without confirmation |
-| `make generate-cards` | Generate monthly event cards as PNG images |
-| `make list-cards` | List generated event card files |
-| `make cards` | Generate and list event cards (combined) |
+| `make cards` | Generate and list monthly event cards files as PNG images |
 | `make json-to-csv` | Convert JSON event files to CSV format |
 | `make compare-data` | Compare Supabase CSV export with JSON files |
 | `make compare-data-verbose` | Compare with detailed field analysis |

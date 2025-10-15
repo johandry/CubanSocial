@@ -68,18 +68,12 @@ insert-missing-force:
 	@echo "⚠️  Force inserting missing events..."
 	@python3 scripts/insert-missing-events.py --force
 
-# Generate event cards
-generate-cards:
+# Generate and list available event cards
+cards:
 	@echo "🎨 Generating event cards..."
 	@node scripts/generate-event-cards.js
-
-# List available event cards
-list-cards:
 	@echo "📋 Listing available event cards..."
 	@node scripts/list-cards.js
-
-# Generate and list event cards (combined)
-cards: generate-cards list-cards
 	@echo "✅ Event cards generation and listing completed"
 
 # Convert JSON data to CSV format
