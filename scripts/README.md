@@ -4,7 +4,19 @@ This directory contains utility scripts for managing Cuban Social event data.
 
 ## Quick Start
 
-### Setup
+### Automated Setup
+
+The easiest way to get started:
+
+```bash
+make install          # Install all dependencies
+source .venv/bin/activate  # Activate Python environment
+make help             # See all available commands
+```
+
+### Manual Setup (Alternative)
+
+If you prefer to set up manually:
 
 1. Install Node.js dependencies: `npm install`
 2. Set up Python virtual environment and dependencies:
@@ -20,7 +32,7 @@ This directory contains utility scripts for managing Cuban Social event data.
     pip install supabase
     ```
 
-3. Run `npm run` to see all available commands
+3. Run `make help` to see all available commands
 
 **Note**: Remember to activate the virtual environment (`source .venv/bin/activate`) before running any Python scripts
 
@@ -29,42 +41,58 @@ This directory contains utility scripts for managing Cuban Social event data.
 **Export events from Supabase to JSON files:**
 
 ```bash
-npm run export-events
+make export-events
 ```
 
 **Compare data between sources:**
 
 ```bash
-npm run compare-data
+make compare-data
 ```
 
 **Insert missing events (with preview):**
 
 ```bash
-npm run insert-missing-dry-run    # Preview first
-npm run insert-missing-events     # Actual insertion
+make insert-missing-dry-run    # Preview first
+make insert-missing-events     # Actual insertion
 ```
 
 **Generate monthly event cards:**
 
 ```bash
-npm run generate-cards
-npm run list-cards
+make cards
+# or individually:
+make generate-cards
+make list-cards
+```
+
+**Start development server:**
+
+```bash
+make start
 ```
 
 ## Available Commands
 
+All commands are now managed through the Makefile. Run `make help` for the complete list:
+
 | Command | Description |
 |---------|-------------|
-| `npm run export-events` | Export events from Supabase to JSON files |
-| `npm run insert-missing-events` | Insert missing events from JSON to Supabase |
-| `npm run insert-missing-dry-run` | Preview missing events without inserting |
-| `npm run insert-missing-force` | Insert missing events without confirmation |
-| `npm run generate-cards` | Generate monthly event cards as PNG images |
-| `npm run list-cards` | List generated event card files |
-| `npm run json-to-csv` | Convert JSON event files to CSV format |
-| `npm run compare-data` | Compare Supabase CSV export with JSON files |
-| `npm run compare-data-verbose` | Compare with detailed field analysis |
+| `make install` | Install all dependencies (Node.js + Python) |
+| `make setup` | Alias for install |
+| `make clean` | Remove all unnecessary files |
+| `make start` | Start local development server on port 8000 |
+| `make server` | Alias for start |
+| `make export-events` | Export events from Supabase to JSON files |
+| `make insert-missing-events` | Insert missing events from JSON to Supabase |
+| `make insert-missing-dry-run` | Preview missing events without inserting |
+| `make insert-missing-force` | Insert missing events without confirmation |
+| `make generate-cards` | Generate monthly event cards as PNG images |
+| `make list-cards` | List generated event card files |
+| `make cards` | Generate and list event cards (combined) |
+| `make json-to-csv` | Convert JSON event files to CSV format |
+| `make compare-data` | Compare Supabase CSV export with JSON files |
+| `make compare-data-verbose` | Compare with detailed field analysis |
 
 ## Event Data Export
 
@@ -73,8 +101,8 @@ npm run list-cards
 ### Usage
 
 ```bash
-npm run export-events
-# or
+make export-events
+# or (legacy)
 node scripts/supabase-to-json.js
 ```
 
@@ -101,10 +129,10 @@ node scripts/supabase-to-json.js
 ### Usage
 
 ```bash
-npm run insert-missing-events        # With confirmation prompt
-npm run insert-missing-dry-run       # Preview only (recommended first)
-npm run insert-missing-force         # Skip confirmation
-# or
+make insert-missing-events        # With confirmation prompt
+make insert-missing-dry-run       # Preview only (recommended first)
+make insert-missing-force         # Skip confirmation
+# or (legacy)
 python3 scripts/insert-missing-events.py
 python3 scripts/insert-missing-events.py --dry-run
 python3 scripts/insert-missing-events.py --force
@@ -145,7 +173,7 @@ python3 scripts/insert-missing-events.py --force
 **Usage with debug mode:**
 
 ```bash
-DEBUG=true npm run insert-missing-events
+DEBUG=true make insert-missing-events
 # or
 DEBUG=true python3 scripts/insert-missing-events.py --dry-run
 ```
@@ -172,16 +200,10 @@ The script will:
 ### Usage
 
 ```bash
-npm run generate-cards
-# or
+make cards
+make list-cards
+# or (legacy)
 node scripts/generate-event-cards.js
-```
-
-To list the generated cards:
-
-```bash
-npm run list-cards
-# or
 node scripts/list-cards.js
 ```
 
@@ -219,20 +241,20 @@ node scripts/list-cards.js
 2. **Convert JSON files to CSV**:
 
    ```bash
-   npm run json-to-csv
+   make json-to-csv
    ```
 
 3. **Compare the data**:
 
    ```bash
-   npm run compare-data              # Basic comparison
-   npm run compare-data-verbose      # Detailed field analysis
+   make compare-data              # Basic comparison
+   make compare-data-verbose      # Detailed field analysis
    ```
 
 4. **Take action based on results**:
-   - **Missing in DB**: `npm run insert-missing-events`, then approve the events in the dashboard
-   - **Missing in JSON**: `npm run export-events`
-   - **Data differences**: Update DB manually, then `npm run export-events`
+   - **Missing in DB**: `make insert-missing-events`, then approve the events in the dashboard
+   - **Missing in JSON**: `make export-events`
+   - **Data differences**: Update DB manually, then `make export-events`
 
 ### Data Conversion
 
@@ -241,8 +263,8 @@ node scripts/list-cards.js
 #### Usage
 
 ```bash
-npm run json-to-csv
-# or
+make json-to-csv
+# or (legacy)
 python3 scripts/json_to_csv.py
 ```
 
@@ -268,9 +290,11 @@ python3 scripts/json_to_csv.py
 #### Usage
 
 ```bash
-npm run compare-data
-# or
+make compare-data
+make compare-data-verbose
+# or (legacy)
 python3 scripts/compare-csv.py
+python3 scripts/compare-csv.py --verbose
 ```
 
 #### Features
@@ -298,6 +322,25 @@ python3 scripts/compare-csv.py
   - Summary statistics and recommendations
 - Clear indication of required actions for data reconciliation
 
+## Development Server
+
+### Usage
+
+```bash
+make start
+# or
+make server
+```
+
+This starts a Python HTTP server on port 8000, serving the application at `http://localhost:8000`.
+
+### Features
+
+- Simple HTTP server for local development
+- Serves static files and allows AJAX requests
+- No build step required
+- Press Ctrl+C to stop the server
+
 ## Configuration
 
 ### Required Files
@@ -318,9 +361,9 @@ npm install
 
 ```bash
 # Create and activate virtual environment (recommended)
-python3 -m venv venv
-source venv/bin/activate  # On macOS/Linux
-pip install supabase      # Install required packages
+python3 -m venv .venv
+source .venv/bin/activate  # On macOS/Linux
+pip install supabase       # Install required packages
 ```
 
 ## Troubleshooting
@@ -329,16 +372,30 @@ pip install supabase      # Install required packages
 
 1. **Missing CSV files**: Export the events table from Supabase first
 2. **Python import errors**: 
-   - Make sure you've activated the virtual environment: `source venv/bin/activate`
+   - Make sure you've activated the virtual environment: `source .venv/bin/activate`
    - Install required packages: `pip install supabase`
 3. **Permission errors**: Ensure write permissions for `data/` directories
-4. **Virtual environment not found**: Create it first with `python3 -m venv venv`
+4. **Virtual environment not found**: Create it first with `python3 -m venv .venv`
+5. **Make command not found**: Install make for your operating system
 
 ### Getting Help
 
 ```bash
-npm run                                        # Show available commands
-DEBUG=true npm run insert-missing-dry-run      # Debug mode with dry run
+make help                                      # Show all available commands
+make clean                                     # Clean up files and start fresh
+DEBUG=true make insert-missing-dry-run         # Debug mode with dry run
 python3 scripts/insert-missing-events.py --help # Python script help
 python3 scripts/compare-csv.py --help           # Comparison script help
+```
+
+### Quick Reset
+
+If you need to start fresh:
+
+```bash
+make clean                                     # Remove temporary files
+make install                                   # Reinstall dependencies
+source .venv/bin/activate                      # Activate Python environment
+make export-events                             # Get latest data from database
+make start                                     # Start development server
 ```

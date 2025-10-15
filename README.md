@@ -14,6 +14,102 @@ Cuban Social is a community-driven platform for discovering salsa, timba, bachat
 - **🎯 Admin Review System**: Quality control through GitHub-based review process
 - **⚡ Real-time Updates**: Live event data with instant updates
 
+## 🚀 Getting Started
+
+### For Users
+
+1. Visit [Cuban Social](https://CubanSocial.com)
+2. Browse upcoming events or use filters to find specific dance types
+3. Click "Directions" to get Google Maps directions to events
+4. Use "Add to Calendar" to save events to your calendar
+
+### For Event Organizers
+
+#### Quick Submit (Recommended)
+
+1. Visit the "Submit Event" section on the website
+2. Fill out the event submission form
+3. Submit directly to the database for immediate review
+4. Admins receive notifications and can approve/reject
+
+### For Contributors/Developers
+
+1. Clone this repository:
+
+   ```bash
+   git clone https://github.com/johandry/CubanSocial.git
+   cd CubanSocial
+   ```
+
+2. Install all dependencies:
+
+   ```bash
+   make install
+   # or
+   make setup
+   ```
+
+   This will:
+   - Install Node.js dependencies (`npm install`)
+   - Create Python virtual environment (`.venv`)
+   - Install Python packages (`supabase`)
+
+3. Activate the Python environment (for Python scripts):
+
+   ```bash
+   source .venv/bin/activate
+   ```
+
+4. Start the local development server:
+
+   ```bash
+   make start
+   # or
+   make server
+   ```
+
+   This will serve the application at `http://localhost:8000`
+
+5. See all available commands:
+
+   ```bash
+   make help
+   ```
+
+## 🛠️ Development Commands
+
+All development tasks are managed through the Makefile. Run `make help` to see all available commands:
+
+| Command | Description |
+|---------|-------------|
+| `make install` | Install all dependencies (Node.js + Python) |
+| `make setup` | Alias for install |
+| `make clean` | Remove all unnecessary files |
+| `make start` | Start local development server on port 8000 |
+| `make server` | Alias for start |
+| `make export-events` | Export events from Supabase to JSON |
+| `make insert-missing-events` | Insert missing events to database |
+| `make insert-missing-dry-run` | Dry run of missing events insertion |
+| `make insert-missing-force` | Force insert missing events |
+| `make generate-cards` | Generate event cards |
+| `make list-cards` | List available event cards |
+| `make cards` | Generate and list event cards |
+| `make json-to-csv` | Convert JSON data to CSV format |
+| `make compare-data` | Compare CSV data |
+| `make compare-data-verbose` | Compare CSV data with verbose output |
+| `make help` | Show this help message |
+
+### Quick Start Workflow
+
+**Complete setup from scratch:**
+```bash
+git clone https://github.com/johandry/CubanSocial.git
+cd CubanSocial
+make install          # Install all dependencies
+source .venv/bin/activate  # Activate Python environment
+make start            # Start development server
+```
+
 ## 🏗️ Architecture
 
 ### Tech Stack
@@ -85,7 +181,6 @@ CREATE POLICY "Admins can manage events" ON events
 │   └── admin.js           # Admin database operations
 ├── data/                  # JSON fallback data (legacy)
 │   ├── events/            # Approved events (fallback)
-│   ├── events-pending/    # Submitted events (fallback)
 │   ├── playlists/         # Music playlists
 │   └── congresses/        # Dance congress information
 ├── .github/
@@ -93,51 +188,6 @@ CREATE POLICY "Admins can manage events" ON events
 │   └── PULL_REQUEST_TEMPLATE/ # PR templates
 └── docs/                  # Documentation
 ```
-
-## 🚀 Getting Started
-
-### For Users
-
-1. Visit [Cuban Social](https://CubanSocial.com)
-2. Browse upcoming events or use filters to find specific dance types
-3. Click "Directions" to get Google Maps directions to events
-4. Use "Add to Calendar" to save events to your calendar
-
-### For Event Organizers
-
-#### Quick Submit (Recommended)
-
-1. Visit the "Submit Event" section on the website
-2. Fill out the event submission form
-3. Submit directly to the database for immediate review
-4. Admins receive notifications and can approve/reject
-
-### For Contributors/Developers
-
-1. Clone this repository:
-
-   ```bash
-   git clone https://github.com/johandry/CubanSocial.git
-   cd CubanSocial
-   ```
-
-2. Install dependencies (if using build tools):
-
-   ```bash
-   npm install
-   ```
-
-3. Serve locally:
-
-   ```bash
-   # Using Python 3
-   python -m http.server 8000
-   
-   # Using Node.js (with http-server)
-   npx http-server
-   ```
-
-4. Make your changes and submit a pull request
 
 ## 🗄️ Database Management
 
@@ -153,10 +203,32 @@ CREATE POLICY "Admins can manage events" ON events
 
 4. **Set Up Real-time**: Enable real-time subscriptions for the events table
 
+### Data Management Commands
+
+**Export events from Supabase to local JSON files:**
+
+```bash
+make export-events
+```
+
+**Insert missing events from JSON files to database:**
+
+```bash
+make insert-missing-dry-run    # Preview first
+make insert-missing-events     # Actual insertion
+```
+
+**Compare data between sources:**
+
+```bash
+make compare-data              # Basic comparison
+make compare-data-verbose      # Detailed analysis
+```
+
 ### Backup Strategy
 
 - **Primary**: Supabase automatic backups
-- **Secondary**: Weekly JSON exports to `/data` directory
+- **Secondary**: Weekly JSON exports using `make export-events`
 - **Tertiary**: GitHub repository history
 
 ## 📊 Analytics Setup
@@ -250,6 +322,24 @@ GROUP BY status, week
 ORDER BY week DESC;
 ```
 
+### Data Maintenance Commands
+
+**Keep local data synchronized:**
+
+```bash
+make export-events              # Download latest from database
+make compare-data               # Check for discrepancies
+make insert-missing-events      # Upload missing events
+```
+
+**Generate promotional materials:**
+
+```bash
+make cards                      # Generate and list all cards
+make generate-cards             # Create monthly event cards
+make list-cards                 # View generated cards
+```
+
 ### Review Checklist
 
 When reviewing event submissions, check:
@@ -310,7 +400,13 @@ We welcome contributions! Here's how you can help:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Set up your local Supabase environment
+3. Set up your local development environment:
+
+   ```bash
+   npm install
+   make start
+   ```
+
 4. Make your changes and test with both database and fallback modes
 5. Commit your changes (`git commit -m 'Add amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
@@ -319,7 +415,7 @@ We welcome contributions! Here's how you can help:
 ### Database Contributions
 
 - Help optimize queries and database schema
-- Contribute to data migration scripts
+- Contribute to data migration scripts using `make` commands
 - Improve backup and recovery procedures
 
 ### Event Contributions
@@ -338,6 +434,7 @@ The application deploys as a static site with dynamic database connectivity:
 2. **Database**: Hosted on Supabase cloud
 3. **Environment Variables**: Configured in GitHub Actions
 4. **Build Process**: Automated via GitHub Actions
+5. **Data Sync**: Use `make export-events` to keep JSON fallbacks updated
 
 ## 🌍 Expansion Plans
 
