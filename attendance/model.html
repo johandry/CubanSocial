@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Estimation Model - How It Works</title>
+  <link rel="stylesheet" href="model.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <a href="index.html" class="back-link">← Back to Calculator</a>
+      <h1>📊 Attendance Estimation Model</h1>
+      <p class="subtitle">Understanding the probabilistic approach to event attendance prediction</p>
+    </header>
+
+    <div class="content">
+      <section class="overview">
+        <h2>Overview</h2>
+        <p>This document describes the probabilistic model used to estimate expected attendance at events based on RSVP responses. The model accounts for different response types (Yes, Maybe, No, and No Response) and assigns probability weights to each category based on behavioral patterns.</p>
+      </section>
+
+      <section class="section">
+        <h2>1. Definitions</h2>
+        <p>Let:</p>
+        <ul class="definitions">
+          <li><strong>T</strong>: Total number of people in the group (poll list)</li>
+          <li><strong>Y</strong>: Number of "Yes" responses</li>
+          <li><strong>M</strong>: Number of "Maybe" responses</li>
+          <li><strong>N</strong>: Number of "No" responses</li>
+          <li><strong>U</strong>: Number of people who didn't respond (Unknown)</li>
+        </ul>
+        <p class="formula-note">Where: <code>U = T - (Y + M + N)</code> and <code>Y + M + N + U = T</code></p>
+      </section>
+
+      <section class="section">
+        <h2>2. Probabilistic Model</h2>
+        <p>Each response category corresponds to a conditional probability that a person will actually attend:</p>
+        <ul class="definitions">
+          <li><strong>p<sub>Y</sub></strong> = P(attends | Yes): Probability that someone who responded "Yes" actually attends</li>
+          <li><strong>p<sub>M</sub></strong> = P(attends | Maybe): Probability that someone who responded "Maybe" attends</li>
+          <li><strong>p<sub>N</sub></strong> = P(attends | No): Probability that someone who responded "No" attends</li>
+          <li><strong>p<sub>U</sub></strong> = P(attends | Unknown): Probability that someone who didn't respond attends</li>
+        </ul>
+
+        <h3>Expected Value Formula</h3>
+        <p>The expected number of attendees (E) is calculated as:</p>
+        <div class="formula">
+          E = (p<sub>Y</sub> × Y) + (p<sub>M</sub> × M) + (p<sub>N</sub> × N) + (p<sub>U</sub> × U)
+        </div>
+
+        <h3>Expected Attendance Rate</h3>
+        <p>The expected attendance rate as a fraction of the total is:</p>
+        <div class="formula">
+          Expected Rate = E / T
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>3. Default Probability Values</h2>
+        <p>Based on behavioral data from event RSVP patterns, marketing studies, and platforms like Meetup, reasonable default probabilities are:</p>
+        
+        <table class="probability-table">
+          <thead>
+            <tr>
+              <th>Response Type</th>
+              <th>Probability</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Yes (Y)</strong></td>
+              <td><span class="prob-value">0.80 (80%)</span></td>
+              <td>Most committed, but some drop out</td>
+            </tr>
+            <tr>
+              <td><strong>Maybe (M)</strong></td>
+              <td><span class="prob-value">0.40 (40%)</span></td>
+              <td>Uncertain, about half don't show</td>
+            </tr>
+            <tr>
+              <td><strong>No (N)</strong></td>
+              <td><span class="prob-value">0.05 (5%)</span></td>
+              <td>Rarely attend, but occasional changes</td>
+            </tr>
+            <tr>
+              <td><strong>Unknown (U)</strong></td>
+              <td><span class="prob-value">0.15 (15%)</span></td>
+              <td>Lower than "Maybe" but not zero</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Rationale for p<sub>U</sub></h3>
+        <p>People who don't respond typically:</p>
+        <ul>
+          <li>Have lower engagement than those who actively respond</li>
+          <li>Are more likely to skip than "Maybe" respondents</li>
+          <li>Still attend occasionally (hence not 0%)</li>
+        </ul>
+        <p>A typical value of <strong>0.15</strong> is conservative and can be adjusted based on historical data, event type, and group characteristics.</p>
+      </section>
+
+      <section class="section example-section">
+        <h2>4. Calculation Example</h2>
+        
+        <div class="example-box">
+          <h3>Scenario</h3>
+          <ul class="example-data">
+            <li><strong>T</strong> = 100 (total people)</li>
+            <li><strong>Y</strong> = 50 (responded "Yes")</li>
+            <li><strong>M</strong> = 20 (responded "Maybe")</li>
+            <li><strong>N</strong> = 10 (responded "No")</li>
+            <li><strong>U</strong> = 100 - (50 + 20 + 10) = <strong>20</strong> (no response)</li>
+          </ul>
+
+          <h3>Step-by-Step Calculation</h3>
+          <p>Using default probabilities:</p>
+          <ol class="calculation-steps">
+            <li><strong>Yes contribution:</strong> 0.80 × 50 = <span class="result">40.0</span></li>
+            <li><strong>Maybe contribution:</strong> 0.40 × 20 = <span class="result">8.0</span></li>
+            <li><strong>No contribution:</strong> 0.05 × 10 = <span class="result">0.5</span></li>
+            <li><strong>Unknown contribution:</strong> 0.15 × 20 = <span class="result">3.0</span></li>
+          </ol>
+
+          <div class="final-result">
+            <p><strong>Total:</strong> E = 40.0 + 8.0 + 0.5 + 3.0 = <span class="highlight">51.5 people</span></p>
+            <p><strong>Expected Rate:</strong> 51.5 / 100 = <span class="highlight">51.5%</span></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>5. Uncertainty Estimation</h2>
+        
+        <h3>Variance Calculation</h3>
+        <p>If we model each person's attendance as an independent Bernoulli trial, the variance of the expected attendance is:</p>
+        <div class="formula multi-line">
+          Var(E) = Y × p<sub>Y</sub> × (1 - p<sub>Y</sub>) +<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M × p<sub>M</sub> × (1 - p<sub>M</sub>) +<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N × p<sub>N</sub> × (1 - p<sub>N</sub>) +<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;U × p<sub>U</sub> × (1 - p<sub>U</sub>)
+        </div>
+        <p>The <strong>standard deviation</strong> is: <code>σ = √Var(E)</code></p>
+
+        <h3>Using the Example Above</h3>
+        <div class="example-box">
+          <div class="formula multi-line">
+            Var(E) = 50 × 0.80 × 0.20 +<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;20 × 0.40 × 0.60 +<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10 × 0.05 × 0.95 +<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;20 × 0.15 × 0.85<br><br>
+            Var(E) = 8.0 + 4.8 + 0.475 + 2.55 = 15.825<br><br>
+            σ = √15.825 ≈ 3.98
+          </div>
+        </div>
+
+        <h3>Confidence Intervals</h3>
+        <p>Using the normal approximation (valid for large numbers):</p>
+        <ul class="confidence-list">
+          <li><strong>68% confidence interval:</strong> E ± σ ≈ 51.5 ± 4.0 = <span class="highlight">[47.5, 55.5]</span></li>
+          <li><strong>95% confidence interval:</strong> E ± 2σ ≈ 51.5 ± 8.0 = <span class="highlight">[43.5, 59.5]</span></li>
+        </ul>
+        <p class="note">This gives event organizers a range to plan for (e.g., "expect between 48-56 people with high confidence").</p>
+      </section>
+
+      <section class="section">
+        <h2>6. Calibrating the Model</h2>
+        
+        <h3>Empirical Probability Estimation</h3>
+        <p>For more accurate predictions, calculate probabilities from past events:</p>
+        <div class="formula-box">
+          <p>p<sub>Y</sub> = (# of "Yes" who actually attended) / (# total "Yes" responses)</p>
+          <p>p<sub>M</sub> = (# of "Maybe" who actually attended) / (# total "Maybe" responses)</p>
+          <p>p<sub>N</sub> = (# of "No" who actually attended) / (# total "No" responses)</p>
+          <p>p<sub>U</sub> = (# of non-responders who attended) / (# total non-responders)</p>
+        </div>
+
+        <h3>Bayesian Updating</h3>
+        <p>As you collect more data:</p>
+        <ol>
+          <li>Start with default probabilities</li>
+          <li>After each event, update probabilities with actual attendance</li>
+          <li>Use weighted averages (more recent events weighted higher)</li>
+          <li>The model becomes more accurate over time</li>
+        </ol>
+      </section>
+
+      <section class="section">
+        <h2>7. Practical Guidelines</h2>
+        
+        <h3>When to Adjust Default Probabilities</h3>
+        <table class="guidelines-table">
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th>Adjustment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Highly committed community</strong></td>
+              <td>Increase p<sub>Y</sub> to 0.85-0.90</td>
+            </tr>
+            <tr>
+              <td><strong>Casual/free events</strong></td>
+              <td>Decrease p<sub>Y</sub> to 0.60-0.70</td>
+            </tr>
+            <tr>
+              <td><strong>Paid events</strong></td>
+              <td>Increase p<sub>Y</sub> to 0.90-0.95</td>
+            </tr>
+            <tr>
+              <td><strong>Last-minute events</strong></td>
+              <td>Decrease all probabilities by 0.10-0.15</td>
+            </tr>
+            <tr>
+              <td><strong>Regular attendees</strong></td>
+              <td>Increase p<sub>U</sub> to 0.20-0.25</td>
+            </tr>
+            <tr>
+              <td><strong>New group/first event</strong></td>
+              <td>Use conservative defaults</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Best Practices</h3>
+        <ul class="best-practices">
+          <li><strong>Track actual attendance:</strong> Record who actually showed up vs. their RSVP</li>
+          <li><strong>Segment by event type:</strong> Different event types may have different patterns</li>
+          <li><strong>Consider seasonality:</strong> Summer vacations, holidays affect attendance</li>
+          <li><strong>Update regularly:</strong> Recalibrate probabilities quarterly or after every 5-10 events</li>
+          <li><strong>Plan for the range:</strong> Use E - σ for minimum planning, E + σ for maximum</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>8. Mathematical Foundation</h2>
+        
+        <h3>Why This Model Works</h3>
+        <ul>
+          <li><strong>Linearity of Expectation:</strong> E[X + Y] = E[X] + E[Y] allows us to sum contributions</li>
+          <li><strong>Independent trials:</strong> Assuming independence, variance adds linearly</li>
+          <li><strong>Law of Large Numbers:</strong> For large T, the estimate converges to the true mean</li>
+          <li><strong>Central Limit Theorem:</strong> For large samples, attendance distribution is approximately normal</li>
+        </ul>
+
+        <h3>Assumptions</h3>
+        <ul>
+          <li>Each person's attendance decision is independent</li>
+          <li>Probabilities are constant within each category</li>
+          <li>Past behavior predicts future behavior</li>
+          <li>No systematic changes in the population</li>
+        </ul>
+
+        <h3>Limitations</h3>
+        <p>The model doesn't account for:</p>
+        <ul>
+          <li>Social influence (friends attending together)</li>
+          <li>Weather or external events</li>
+          <li>Competing events on the same date</li>
+          <li>Changes in group dynamics</li>
+          <li>Individual motivation fluctuations</li>
+        </ul>
+      </section>
+
+      <section class="section summary-section">
+        <h2>Summary</h2>
+        <p>This model provides a data-driven, statistically sound method for estimating event attendance. By combining:</p>
+        <ul class="summary-list">
+          <li>Probabilistic reasoning</li>
+          <li>Historical behavioral patterns</li>
+          <li>Uncertainty quantification</li>
+          <li>Easy calibration with real data</li>
+        </ul>
+        <p>Event organizers can make better-informed decisions about venue size, catering, staffing, and resource allocation.</p>
+        <div class="key-takeaway">
+          <strong>Key takeaway:</strong> Start with defaults, track your data, and refine over time for increasingly accurate predictions.
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <a href="index.html" class="back-link">← Back to Calculator</a>
+    </footer>
+  </div>
+</body>
+</html>
