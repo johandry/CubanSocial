@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Estimator - CubanSocial</title>
+  <link rel="stylesheet" href="attendance.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>📊 Attendance Estimator</h1>
+        <p class="subtitle">Calculate the estimated participation for your event</p>
+      </div>
+
+      <form id="attendanceForm" class="form">
+        <div class="input-group">
+          <label for="T">
+            <span class="label-icon">👥</span>
+            Total People (T)
+          </label>
+          <input 
+            id="T" 
+            type="number" 
+            min="0" 
+            placeholder="e.g., 100"
+            aria-label="Total people in the group"
+          >
+          <small class="help-text">Total people in the group</small>
+        </div>
+
+        <div class="responses-grid">
+          <div class="input-group">
+            <label for="Y">
+              <span class="label-icon">✅</span>
+              Yes (Y)
+            </label>
+            <input 
+              id="Y" 
+              type="number" 
+              min="0" 
+              placeholder="e.g., 50"
+              aria-label="People who responded Yes"
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="M">
+              <span class="label-icon">❓</span>
+              Maybe (M)
+            </label>
+            <input 
+              id="M" 
+              type="number" 
+              min="0" 
+              placeholder="e.g., 20"
+              aria-label="People who responded Maybe"
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="N">
+              <span class="label-icon">❌</span>
+              No (N)
+            </label>
+            <input 
+              id="N" 
+              type="number" 
+              min="0" 
+              placeholder="e.g., 10"
+              aria-label="People who responded No"
+            >
+          </div>
+        </div>
+
+        <button type="submit" class="btn-calculate">
+          <span>Calculate Estimate</span>
+        </button>
+      </form>
+
+      <div id="results" class="results hidden">
+        <div class="result-card">
+          <div class="result-main">
+            <div class="result-icon">🎯</div>
+            <div id="output" class="result-number"></div>
+            <div id="percentage" class="result-percentage"></div>
+          </div>
+          
+          <div class="result-details">
+            <div class="detail-item">
+              <span class="detail-label">Standard deviation:</span>
+              <span id="stdDev" class="detail-value"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">No response (U):</span>
+              <span id="noResponse" class="detail-value"></span>
+            </div>
+          </div>
+
+          <div class="probability-info">
+            <h3>Probabilities used:</h3>
+            <ul>
+              <li><strong>Yes:</strong> 80% attendance</li>
+              <li><strong>Maybe:</strong> 40% attendance</li>
+              <li><strong>No:</strong> 5% attendance</li>
+              <li><strong>No response:</strong> 15% attendance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="attendance.js"></script>
+</body>
+</html>
