@@ -1,6 +1,6 @@
 // Supabase client setup using CDN
-// Import from CDN for browser compatibility
-import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
+// Import from official Supabase CDN for browser compatibility (includes all dependencies)
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // These keys are safe to be public - they're designed for frontend applications
 // Security is handled by Row Level Security (RLS) policies in the database
