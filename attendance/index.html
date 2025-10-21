@@ -12,6 +12,84 @@
       <div class="card-header">
         <h1>📊 Attendance Estimator</h1>
         <p class="subtitle">Calculate the estimated participation for your event</p>
+        <a href="model.html" class="how-it-works-link">How this works →</a>
+      </div>
+
+      <div class="probability-toggle">
+        <label class="toggle-label">
+          <input type="checkbox" id="useCustomProbs" class="toggle-checkbox">
+          <span class="toggle-slider"></span>
+          <span class="toggle-text">Use custom probabilities from historical data</span>
+        </label>
+      </div>
+
+      <div id="historicalDataSection" class="historical-section hidden">
+        <h3>📊 Historical Data</h3>
+        <p class="section-description">Enter data from past events to calculate custom probabilities</p>
+        
+        <div class="historical-grid">
+          <div class="historical-group">
+            <label for="hist_Y_total">
+              <span class="label-icon">✅</span>
+              Total "Yes" responses
+            </label>
+            <input id="hist_Y_total" type="number" min="0" placeholder="e.g., 200">
+          </div>
+          <div class="historical-group">
+            <label for="hist_Y_attended">
+              Actual "Yes" attendees
+            </label>
+            <input id="hist_Y_attended" type="number" min="0" placeholder="e.g., 160">
+            <small class="prob-display" id="prob_Y_display"></small>
+          </div>
+
+          <div class="historical-group">
+            <label for="hist_M_total">
+              <span class="label-icon">❓</span>
+              Total "Maybe" responses
+            </label>
+            <input id="hist_M_total" type="number" min="0" placeholder="e.g., 100">
+          </div>
+          <div class="historical-group">
+            <label for="hist_M_attended">
+              Actual "Maybe" attendees
+            </label>
+            <input id="hist_M_attended" type="number" min="0" placeholder="e.g., 40">
+            <small class="prob-display" id="prob_M_display"></small>
+          </div>
+
+          <div class="historical-group">
+            <label for="hist_N_total">
+              <span class="label-icon">❌</span>
+              Total "No" responses
+            </label>
+            <input id="hist_N_total" type="number" min="0" placeholder="e.g., 80">
+          </div>
+          <div class="historical-group">
+            <label for="hist_N_attended">
+              Actual "No" attendees
+            </label>
+            <input id="hist_N_attended" type="number" min="0" placeholder="e.g., 4">
+            <small class="prob-display" id="prob_N_display"></small>
+          </div>
+
+          <div class="historical-group">
+            <label for="hist_U_total">
+              <span class="label-icon">❔</span>
+              Total non-responders
+            </label>
+            <input id="hist_U_total" type="number" min="0" placeholder="e.g., 150">
+          </div>
+          <div class="historical-group">
+            <label for="hist_U_attended">
+              Actual non-responder attendees
+            </label>
+            <input id="hist_U_attended" type="number" min="0" placeholder="e.g., 22">
+            <small class="prob-display" id="prob_U_display"></small>
+          </div>
+        </div>
+
+        <div class="custom-probs-summary" id="customProbsSummary"></div>
       </div>
 
       <form id="attendanceForm" class="form">
@@ -100,12 +178,13 @@
 
           <div class="probability-info">
             <h3>Probabilities used:</h3>
-            <ul>
-              <li><strong>Yes:</strong> 80% attendance</li>
-              <li><strong>Maybe:</strong> 40% attendance</li>
-              <li><strong>No:</strong> 5% attendance</li>
-              <li><strong>No response:</strong> 15% attendance</li>
+            <ul id="probabilitiesUsed">
+              <li><strong>Yes:</strong> <span id="usedProb_Y">80%</span> attendance</li>
+              <li><strong>Maybe:</strong> <span id="usedProb_M">40%</span> attendance</li>
+              <li><strong>No:</strong> <span id="usedProb_N">5%</span> attendance</li>
+              <li><strong>No response:</strong> <span id="usedProb_U">15%</span> attendance</li>
             </ul>
+            <small id="probSource" class="prob-source">Using default probabilities</small>
           </div>
         </div>
       </div>

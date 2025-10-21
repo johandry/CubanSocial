@@ -11,6 +11,9 @@ const DEFAULT_PROBABILITIES = {
   pU: 0.15  // Unknown: 15% probability of attendance
 };
 
+// Store custom probabilities calculated from historical data
+let customProbabilities = null;
+
 /**
  * Estimates the attendance based on responses and probabilities
  * @param {number} T - Total number of people
@@ -87,10 +90,118 @@ function validateInputs(T, Y, M, N) {
 }
 
 /**
+ * Calculates probabilities from historical data
+ * @param {number} total - Total responses of this type
+ * @param {number} attended - Number who actually attended
+ * @returns {number|null} Calculated probability or null if invalid
+ */
+function calculateProbability(total, attended) {
+  if (total <= 0) return null;
+  if (attended < 0 || attended > total) return null;
+  return attended / total;
+}
+
+/**
+ * Updates the custom probabilities from historical data
+ */
+function updateCustomProbabilities() {
+  const hist_Y_total = parseFloat(document.getElementById('hist_Y_total').value) || 0;
+  const hist_Y_attended = parseFloat(document.getElementById('hist_Y_attended').value) || 0;
+  const hist_M_total = parseFloat(document.getElementById('hist_M_total').value) || 0;
+  const hist_M_attended = parseFloat(document.getElementById('hist_M_attended').value) || 0;
+  const hist_N_total = parseFloat(document.getElementById('hist_N_total').value) || 0;
+  const hist_N_attended = parseFloat(document.getElementById('hist_N_attended').value) || 0;
+  const hist_U_total = parseFloat(document.getElementById('hist_U_total').value) || 0;
+  const hist_U_attended = parseFloat(document.getElementById('hist_U_attended').value) || 0;
+
+  // Calculate probabilities
+  const pY = calculateProbability(hist_Y_total, hist_Y_attended);
+  const pM = calculateProbability(hist_M_total, hist_M_attended);
+  const pN = calculateProbability(hist_N_total, hist_N_attended);
+  const pU = calculateProbability(hist_U_total, hist_U_attended);
+
+  // Update display for each probability
+  document.getElementById('prob_Y_display').textContent = 
+    pY !== null ? `p = ${(pY * 100).toFixed(1)}%` : '';
+  document.getElementById('prob_M_display').textContent = 
+    pM !== null ? `p = ${(pM * 100).toFixed(1)}%` : '';
+  document.getElementById('prob_N_display').textContent = 
+    pN !== null ? `p = ${(pN * 100).toFixed(1)}%` : '';
+  document.getElementById('prob_U_display').textContent = 
+    pU !== null ? `p = ${(pU * 100).toFixed(1)}%` : '';
+
+  // Store custom probabilities (use defaults for missing values)
+  customProbabilities = {
+    pY: pY !== null ? pY : DEFAULT_PROBABILITIES.pY,
+    pM: pM !== null ? pM : DEFAULT_PROBABILITIES.pM,
+    pN: pN !== null ? pN : DEFAULT_PROBABILITIES.pN,
+    pU: pU !== null ? pU : DEFAULT_PROBABILITIES.pU
+  };
+
+  // Update summary
+  updateCustomProbsSummary();
+}
+
+/**
+ * Updates the custom probabilities summary display
+ */
+function updateCustomProbsSummary() {
+  const summaryElement = document.getElementById('customProbsSummary');
+  
+  if (!customProbabilities) {
+    summaryElement.innerHTML = '';
+    summaryElement.classList.add('hidden');
+    return;
+  }
+
+  summaryElement.classList.remove('hidden');
+  summaryElement.innerHTML = `
+    <h4>📈 Calculated Probabilities</h4>
+    <ul>
+      <li><span>Yes (p<sub>Y</sub>):</span> <span class="prob-value">${(customProbabilities.pY * 100).toFixed(1)}%</span></li>
+      <li><span>Maybe (p<sub>M</sub>):</span> <span class="prob-value">${(customProbabilities.pM * 100).toFixed(1)}%</span></li>
+      <li><span>No (p<sub>N</sub>):</span> <span class="prob-value">${(customProbabilities.pN * 100).toFixed(1)}%</span></li>
+      <li><span>Unknown (p<sub>U</sub>):</span> <span class="prob-value">${(customProbabilities.pU * 100).toFixed(1)}%</span></li>
+    </ul>
+  `;
+}
+
+/**
+ * Gets the active probabilities based on toggle state
+ * @returns {object} Active probabilities
+ */
+function getActiveProbabilities() {
+  const useCustom = document.getElementById('useCustomProbs').checked;
+  return useCustom && customProbabilities ? customProbabilities : DEFAULT_PROBABILITIES;
+}
+
+/**
+ * Updates the displayed probabilities in results
+ * @param {object} probs - Probabilities used in calculation
+ * @param {boolean} isCustom - Whether custom probabilities were used
+ */
+function updateDisplayedProbabilities(probs, isCustom) {
+  document.getElementById('usedProb_Y').textContent = `${(probs.pY * 100).toFixed(1)}%`;
+  document.getElementById('usedProb_M').textContent = `${(probs.pM * 100).toFixed(1)}%`;
+  document.getElementById('usedProb_N').textContent = `${(probs.pN * 100).toFixed(1)}%`;
+  document.getElementById('usedProb_U').textContent = `${(probs.pU * 100).toFixed(1)}%`;
+  
+  const sourceElement = document.getElementById('probSource');
+  sourceElement.textContent = isCustom 
+    ? 'Using custom probabilities from historical data' 
+    : 'Using default probabilities';
+  sourceElement.style.background = isCustom 
+    ? 'rgba(245, 124, 0, 0.1)' 
+    : 'rgba(102, 126, 234, 0.1)';
+  sourceElement.style.color = isCustom ? '#f57c00' : '#667eea';
+}
+
+/**
  * Displays the calculation results
  * @param {object} result - Calculation result object
+ * @param {object} probsUsed - Probabilities used in calculation
  */
-function displayResults(result) {
+function displayResults(result, probsUsed) {
   const resultsSection = document.getElementById('results');
   const outputElement = document.getElementById('output');
   const percentageElement = document.getElementById('percentage');
@@ -107,6 +218,10 @@ function displayResults(result) {
   percentageElement.textContent = `${percentage}% of total`;
   stdDevElement.textContent = `±${stdDev}`;
   noResponseElement.textContent = result.U;
+
+  // Update displayed probabilities
+  const isCustom = document.getElementById('useCustomProbs').checked && customProbabilities !== null;
+  updateDisplayedProbabilities(probsUsed, isCustom);
 
   // Show results with animation
   resultsSection.classList.remove('hidden');
@@ -151,9 +266,26 @@ function handleFormSubmit(event) {
     return;
   }
 
+  // Get active probabilities
+  const probs = getActiveProbabilities();
+
   // Calculate and display results
-  const result = estimateAttendance(T, Y, M, N);
-  displayResults(result);
+  const result = estimateAttendance(T, Y, M, N, probs);
+  displayResults(result, probs);
+}
+
+/**
+ * Toggles the historical data section
+ */
+function toggleHistoricalSection() {
+  const checkbox = document.getElementById('useCustomProbs');
+  const section = document.getElementById('historicalDataSection');
+  
+  if (checkbox.checked) {
+    section.classList.remove('hidden');
+  } else {
+    section.classList.add('hidden');
+  }
 }
 
 /**
@@ -176,6 +308,32 @@ function addInputValidation() {
 }
 
 /**
+ * Adds listeners for historical data inputs
+ */
+function addHistoricalDataListeners() {
+  const historicalInputs = [
+    'hist_Y_total', 'hist_Y_attended',
+    'hist_M_total', 'hist_M_attended',
+    'hist_N_total', 'hist_N_attended',
+    'hist_U_total', 'hist_U_attended'
+  ];
+
+  historicalInputs.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', () => {
+        // Ensure non-negative values
+        if (parseFloat(input.value) < 0) {
+          input.value = 0;
+        }
+        // Update custom probabilities
+        updateCustomProbabilities();
+      });
+    }
+  });
+}
+
+/**
  * Initialize the application
  */
 function init() {
@@ -183,8 +341,15 @@ function init() {
   const form = document.getElementById('attendanceForm');
   form.addEventListener('submit', handleFormSubmit);
 
+  // Add toggle listener
+  const toggleCheckbox = document.getElementById('useCustomProbs');
+  toggleCheckbox.addEventListener('change', toggleHistoricalSection);
+
   // Add input validation
   addInputValidation();
+
+  // Add historical data listeners
+  addHistoricalDataListeners();
 
   // Focus on first input
   document.getElementById('T')?.focus();
