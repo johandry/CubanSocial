@@ -1198,6 +1198,10 @@ class CubanSocialApp {
             // Insert into Supabase
             const { data, error } = await supabase.from('events').insert([supabaseEvent]);
             if (error) {
+                // Check if it's a duplicate key error
+                if (error.message && error.message.includes('duplicate key value violates unique constraint')) {
+                    throw new Error('DUPLICATE_EVENT_DATE');
+                }
                 throw new Error('Supabase error: ' + error.message);
             }
 
@@ -1222,6 +1226,14 @@ class CubanSocialApp {
             console.error('Submission error:', error);
             // Remove loading indicator in case of error
             loadingDiv.remove();
+            
+            // Check if it's a duplicate date error
+            if (error.message === 'DUPLICATE_EVENT_DATE') {
+                const duplicateError = new Error('There is already an event scheduled for this date. Please contact the administrator to resolve this issue.');
+                duplicateError.isDuplicateDate = true;
+                throw duplicateError;
+            }
+            
             throw error;
         }
     }
@@ -1976,7 +1988,13 @@ class CubanSocialApp {
             
         } catch (error) {
             console.error('Error submitting event:', error);
-            this.showError('Failed to submit event. Please try again.');
+            
+            // Check if it's a duplicate date error
+            if (error.isDuplicateDate) {
+                this.showError(error.message);
+            } else {
+                this.showError('Failed to submit event. Please try again.');
+            }
         }
     }
 }
