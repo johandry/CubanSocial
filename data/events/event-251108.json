@@ -1,0 +1,25 @@
+{
+  "id": "event-251108",
+  "name": "Dancing for a cause",
+  "date": "2025-11-08T18:00:00",
+  "location": "9340 Clairemont Mesa Blvd Ste F, San Diego, CA 92123",
+  "maps_link": "https://maps.google.com/?q=9340%20Clairemont%20Mesa%20Blvd%20Ste%20F%2C%20San%20Diego%2C%20CA%2092123",
+  "type": [
+    "salsa",
+    "timba",
+    "bachata",
+    "merengue",
+    "rueda",
+    "cumbia"
+  ],
+  "music": "DJ",
+  "price": "$15",
+  "description": "Community Outreach\n\nLet's come together to support the Sharda Yoga Center for children in Rosarito 💛\n\nThis year, we are dancing for a good cause to raise money & supplies for the children \n\n🍂 Join us on Saturday, November 8 from 6:00pm to 12:30am at Studio K 9340 Clairemont Mesa Blvd Ste F, San Diego, CA 92123\n\n$15 donation appreciated\n\n🇨🇺 7pm-8pm Rueda class by Pepe\nFood & Drinks \nMake donations via\nwww.shardayoga.com\nZelle: 619-756-4601\nVenmo: Esmeralda-Gutierrez-12",
+  "contact": "619 756 4601 ",
+  "featured": false,
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2025-10-21T17:22:23.673+00:00",
+  "updated_at": "2025-10-21T17:22:23.673+00:00",
+  "end_date": "2025-11-09T00:30:00"
+}
