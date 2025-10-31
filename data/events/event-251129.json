@@ -1,0 +1,20 @@
+{
+  "id": "event-251129",
+  "name": "Workshops & Dancing with Laroye Aña",
+  "date": "2025-11-29T13:00:00",
+  "location": "Studio K",
+  "maps_link": "https://maps.app.goo.gl/kXNNj85rvvWuJnZBA",
+  "type": [
+    "timba"
+  ],
+  "music": "DJ",
+  "price": "$20 - $35",
+  "description": "1:00-2:30pm Afro Cuban - Rumba\n2:45-4:00pm Cubaton - Reparto\n4:00-7:00pm Social Dance\n\n$20/class, $35 for all, $20 Social only\n\nSocial Include with the purchase of workshop(s)",
+  "contact": "858 344-2343",
+  "featured": false,
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2025-10-31T22:42:39.376+00:00",
+  "updated_at": "2025-10-31T23:13:19.444+00:00",
+  "end_date": "2025-11-29T19:00:00"
+}
