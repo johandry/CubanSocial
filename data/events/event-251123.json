@@ -1,0 +1,22 @@
+{
+  "id": "event-251123",
+  "name": "ARTE for Cuba",
+  "date": "2025-11-23T15:00:00",
+  "location": "315 Idaho Ave in Escondido ",
+  "maps_link": "https://maps.google.com/?q=315%20Idaho%20Ave%20in%20Escondido",
+  "type": [
+    "timba",
+    "rueda",
+    "cumbia"
+  ],
+  "music": "DJ",
+  "price": "Free",
+  "description": "Sunday 23rd November from 3 to 7 pm, we are organizing a silent auction of art with the proceedings going to support Cuban families in need. An opportunity to get one of Pilar Amigo's original paintings for a good cause. Our home address is 315 Idaho Ave in Escondido. Spanish tapas and paella will be served. Bring something to drink if you want.",
+  "contact": "760-4074234 ",
+  "featured": false,
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2025-11-16T06:48:46.535+00:00",
+  "updated_at": "2025-11-16T06:48:46.535+00:00",
+  "end_date": "2025-11-23T21:00:00"
+}

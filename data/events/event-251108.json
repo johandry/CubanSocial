@@ -2,7 +2,7 @@
   "id": "event-251108",
   "name": "Dancing for a cause",
   "date": "2025-11-08T18:00:00",
-  "location": "Studio K @ 9340 Clairemont Mesa Blvd Ste F",
+  "location": "Studio K",
   "maps_link": "https://maps.app.goo.gl/kXNNj85rvvWuJnZBA",
   "type": [
     "salsa",
@@ -20,6 +20,6 @@
   "recurring": false,
   "status": "approved",
   "created_at": "2025-10-21T17:22:23.673+00:00",
-  "updated_at": "2025-10-31T23:23:32.367+00:00",
+  "updated_at": "2025-10-31T23:33:40.397+00:00",
   "end_date": "2025-11-09T00:30:00"
 }
