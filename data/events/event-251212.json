@@ -8,12 +8,13 @@
     "timba"
   ],
   "music": "DJ",
-  "price": "Not specified",
-  "description": "Three days of Afro-latin workshops with Yusniel Garcia. \nDecember 12th to 14th. \nSocials on Friday and Saturday. ",
+  "price": "$25",
+  "description": "Three days of Afro-latin workshops with Yusniel Garcia. \nDecember 12th to 14th. \nSocials on Friday and Saturday. \n7:00PM Workshop\n8:00PM Social Dancing until 1:00AM\nDJ Mayimbe",
   "contact": "https://www.instagram.com/p/DRVItSQkoDs/?igsh=YzAyMDM1MGJkZA%3D%3D",
   "featured": false,
   "recurring": false,
   "status": "approved",
   "created_at": "2025-11-27T00:29:10.003+00:00",
-  "updated_at": "2025-11-28T21:17:35.592+00:00"
+  "updated_at": "2025-11-28T21:36:06.408+00:00",
+  "end_date": "2025-12-13T01:00:00"
 }

@@ -1,19 +1,20 @@
 {
   "id": "event-251213",
   "name": "Afro-latin workshop day 2 with Yusniel",
-  "date": "2025-12-13T19:00:00",
+  "date": "2025-12-13T12:30:00",
   "location": "Studio K Dance and Fitness, 9340 Clairemont Mesa Blvd Ste F, San Diego, CA 92123",
   "maps_link": "https://maps.app.goo.gl/tRtVUn3TAFF8cQm58",
   "type": [
     "timba"
   ],
   "music": "DJ",
-  "price": "Not specified",
-  "description": "Three days of Afro-latin workshops with Yusniel Garcia. \nDecember 12th to 14th. \nSocial after the workshop. ",
+  "price": "$20",
+  "description": "Three days of Afro-latin workshops with Yusniel Garcia. \nDecember 12th to 14th. \nSocial after the workshop. \n$30 Single Workshop\n$20 Social only\n$83 All 4 workshops, Socials included\n\n1:00 - 5:00PM Workshops\n5:00 - 8:00PM Social Dancing\n",
   "contact": "https://www.instagram.com/p/DRVItSQkoDs/?igsh=YzAyMDM1MGJkZA%3D%3D",
   "featured": false,
   "recurring": false,
   "status": "approved",
   "created_at": "2025-11-27T00:29:10.003+00:00",
-  "updated_at": "2025-11-28T21:18:13.916+00:00"
+  "updated_at": "2025-11-28T21:39:19.48+00:00",
+  "end_date": "2025-12-13T20:00:00"
 }
