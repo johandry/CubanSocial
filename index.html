@@ -39,6 +39,7 @@
                     <a href="#congresses" class="nav-link">Congresses</a>
                     <a href="#playlists" class="nav-link">Playlists</a>
                     <a href="#submit" class="nav-link">Submit Event</a>
+                    <a href="#submit-congress" class="nav-link">Submit Congress</a>
                 </nav>
                 <div class="social-links">
                     <a href="https://www.instagram.com/cubansocial.sd/" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram"><i class="fab fa-instagram"></i></a>
@@ -442,6 +443,120 @@
                     </ol>
                     <p>
                         Want to speed up the process? Tag us on Instagram 
+                        <a href="https://www.instagram.com/cubansocial.sd/" target="_blank" rel="noopener noreferrer">@CubanSocial.SD</a>,
+                        TikTok <a href="https://tiktok.com/@cubansocial" target="_blank" rel="noopener noreferrer">@CubanSocial</a>,
+                        or email <a href="mailto:cubansocial.sd@gmail.com">cubansocial.sd@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Submit Congress Form Section -->
+        <section id="submit-congress" class="submit-section section" style="display: none;">
+            <div class="container">
+                <h2><i class="fas fa-globe-americas"></i> Submit a Congress</h2>
+                <p class="section-description">
+                    Help expand the Cuban dance congress community! Submit congresses from anywhere in the world for admin review.
+                </p>
+                
+                <form id="congress-form" class="event-form">
+                    <div class="form-group">
+                        <label for="congress-name">Congress Name *</label>
+                        <input type="text" id="congress-name" name="name" required 
+                               placeholder="e.g., Cubason Congress 2026">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="congress-start-date">Start Date *</label>
+                            <input type="date" id="congress-start-date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="congress-end-date">End Date *</label>
+                            <input type="date" id="congress-end-date" name="end_date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="congress-location">Location *</label>
+                        <input type="text" id="congress-location" name="location" 
+                               placeholder="City, State/Province, Country" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="congress-description">Description</label>
+                        <textarea id="congress-description" name="description" rows="4"
+                                  placeholder="Brief description of the congress, its focus, and what makes it special"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="congress-website">Official Website *</label>
+                        <input type="url" id="congress-website" name="website" required
+                               placeholder="https://congress-website.com">
+                        <small class="form-help">Link to the official congress website with schedule and registration</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="congress-price">Price Range</label>
+                        <input type="text" id="congress-price" name="price" 
+                               placeholder="e.g., $250 Full Pass, $150-$350, Early Bird $200">
+                        <small class="form-help">General pricing information for attendees</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="featured-artists">Featured Artists/Instructors</label>
+                        <textarea id="featured-artists" name="featured_artists" rows="3"
+                                  placeholder="List main instructors, DJs, and performers (one per line or comma-separated)"></textarea>
+                        <small class="form-help">Optional - List key artists who will be teaching or performing</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="congress-requestor-name">Your Name *</label>
+                            <input type="text" id="congress-requestor-name" name="requestor_name" required
+                                   placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="congress-requestor-contact">Your Contact Information *</label>
+                            <input type="text" id="congress-requestor-contact" name="requestor_contact" required
+                                   placeholder="Email, phone, or social media handle">
+                        </div>
+                    </div>
+                    <div style="margin-top: -16px; margin-bottom: 16px; width: 100%; text-align: left;">
+                        <small class="form-help">We'll contact you when your congress is approved</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="congress-send-confirmation" name="send_confirmation" checked>
+                            <span class="checkmark"></span>
+                            Send me a confirmation email with submission details
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Congress for Review
+                        </button>
+                        <p class="form-note">
+                            <i class="fas fa-info-circle"></i>
+                            Your submission will be reviewed by our team. You'll be notified when your congress is approved and published!
+                        </p>
+                    </div>
+                </form>
+                
+                <div class="submission-info">
+                    <h3><i class="fas fa-question-circle"></i> Congress Submission Guidelines</h3>
+                    <ol>
+                        <li>Provide complete and accurate congress information</li>
+                        <li>Include the official website where attendees can register</li>
+                        <li>List featured instructors and artists if available</li>
+                        <li>Our team will review and approve quality congresses</li>
+                        <li>Your congress will be published and shared with the community!</li>
+                    </ol>
+                    <p>
+                        Questions? Contact us on Instagram 
                         <a href="https://www.instagram.com/cubansocial.sd/" target="_blank" rel="noopener noreferrer">@CubanSocial.SD</a>,
                         TikTok <a href="https://tiktok.com/@cubansocial" target="_blank" rel="noopener noreferrer">@CubanSocial</a>,
                         or email <a href="mailto:cubansocial.sd@gmail.com">cubansocial.sd@gmail.com</a>

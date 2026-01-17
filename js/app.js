@@ -122,6 +122,29 @@ class CubanSocialApp {
         }
     }
 
+    async loadCongressesFromAPI() {
+        try {
+            console.log('Loading congresses from Supabase API...');
+            
+            // Fetch all congresses from Supabase
+            const { data: congresses, error } = await supabase
+                .from('congresses')
+                .select('*')
+                .order('date', { ascending: true });
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
+            console.log(`Loaded ${congresses?.length || 0} congresses from API`);
+            return congresses || [];
+        } catch (error) {
+            console.error('Error loading congresses from API:', error);
+            throw error;
+        }
+    }
+
     async loadEventsFromDirectory() {
         const events = [];
         
@@ -189,7 +212,16 @@ class CubanSocialApp {
 
     async loadCongresses() {
         try {
-            this.congresses = await this.loadCongressesFromDirectory();
+            // Try to load from API first
+            try {
+                this.congresses = await this.loadCongressesFromAPI();
+                console.log('Successfully loaded congresses from API');
+            } catch (apiError) {
+                console.warn('API failed, falling back to local data:', apiError.message);
+                // Fallback to local data if API fails
+                this.congresses = await this.loadCongressesFromDirectory();
+                console.log('Successfully loaded congresses from local directory');
+            }
         } catch (error) {
             console.error('Error loading congresses:', error);
             this.showError(`Failed to load congresses: ${error.message}`);
@@ -343,7 +375,8 @@ class CubanSocialApp {
             'events': 'Events',
             'congresses': 'Congresses', 
             'playlists': 'Playlists',
-            'submit': 'Submit Event'
+            'submit': 'Submit Event',
+            'submit-congress': 'Submit Congress'
         };
         return titles[sectionId] || sectionId;
     }
@@ -496,6 +529,7 @@ class CubanSocialApp {
 
         // Form submission
         document.getElementById('event-form')?.addEventListener('submit', (e) => this.handleFormSubmission(e));
+        document.getElementById('congress-form')?.addEventListener('submit', (e) => this.handleCongressFormSubmission(e));
         
         // Generate Google Maps link from Location
         const generateMapsBtn = document.getElementById('generate-maps-link');
@@ -1995,6 +2029,263 @@ class CubanSocialApp {
             } else {
                 this.showError('Failed to submit event. Please try again.');
             }
+        }
+    }
+
+    async handleCongressFormSubmission(e) {
+        e.preventDefault();
+        console.log('Congress form submission started');
+        
+        try {
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Validate required fields
+            const requiredFields = ['name', 'date', 'end_date', 'location', 'website', 'requestor_name', 'requestor_contact'];
+            const missingFields = [];
+            
+            for (const field of requiredFields) {
+                if (!formData.get(field)) {
+                    missingFields.push(field);
+                }
+            }
+            
+            // Additional validation for requestor contact
+            const contactInfo = formData.get('requestor_contact');
+            if (contactInfo && contactInfo.trim().length < 5) {
+                this.showError('Please provide a valid contact method (email, phone number, or social media handle)');
+                return;
+            }
+            
+            // Check if contact is an email and if it's valid
+            if (contactInfo && contactInfo.includes('@')) {
+                if (!this.isValidEmail(contactInfo)) {
+                    this.showError('Please provide a valid email address');
+                    return;
+                }
+            }
+            
+            if (missingFields.length > 0) {
+                this.showError(`Please fill out all required fields: ${missingFields.join(', ')}`);
+                return;
+            }
+            
+            const congressData = this.parseCongressFormData(formData);
+            console.log('Parsed congress data:', congressData);
+            
+            // Submit the congress and get the response
+            const response = await this.createCongressRequest(congressData);
+            
+            // Track successful congress submission
+            this.trackEvent('congress_submitted', {
+                congress_name: congressData.name || 'Unknown Congress',
+                congress_date: congressData.date || 'Unknown Date',
+                congress_location: congressData.location || 'Unknown Location',
+                request_number: response.request_number
+            });
+            
+            this.showCongressSuccessMessage(response.request_number);
+            form.reset();
+            
+        } catch (error) {
+            console.error('Error submitting congress:', error);
+            this.showError('Failed to submit congress. Please try again.');
+        }
+    }
+
+    parseCongressFormData(formData) {
+        const data = {};
+        
+        // Collect all form fields
+        for (const [key, value] of formData.entries()) {
+            if (key === 'type') {
+                if (!data.type) data.type = [];
+                data.type.push(value);
+            } else if (value.trim() !== '') {  // Skip empty fields
+                data[key] = value;
+            }
+        }
+        
+        // Parse featured artists from textarea (one per line or comma-separated)
+        if (data.featured_artists) {
+            const artistsText = data.featured_artists;
+            // Split by newlines first, then by commas, and clean up
+            data.featured_artists = artistsText
+                .split(/\n|,/)
+                .map(artist => artist.trim())
+                .filter(artist => artist.length > 0);
+        } else {
+            data.featured_artists = [];
+        }
+        
+        // Format dates to ISO strings (congresses already have proper date input format)
+        if (data.date) {
+            const startDate = new Date(data.date + 'T00:00:00');
+            data.date = startDate.toISOString();
+        }
+        
+        if (data.end_date) {
+            const endDate = new Date(data.end_date + 'T23:59:59');
+            data.end_date = endDate.toISOString();
+        }
+        
+        // Handle confirmation email checkbox
+        data.send_confirmation = formData.get('send_confirmation') === 'on';
+        
+        // Store submitter information
+        data.submitter_name = data.requestor_name;
+        data.submitter_email = data.requestor_contact;
+        
+        // Remove requestor fields as they're not in the database schema
+        delete data.requestor_name;
+        delete data.requestor_contact;
+        delete data.send_confirmation;
+        
+        // Generate proper ID (congress-location-year format)
+        data.id = this.generateCongressId(data.name, data.date);
+        data.created_at = new Date().toISOString();
+        
+        return data;
+    }
+
+    generateCongressId(name, dateString) {
+        try {
+            if (!name || !dateString) {
+                return 'congress-' + Date.now();
+            }
+            
+            const congressDate = new Date(dateString);
+            const year = congressDate.getFullYear();
+            const month = (congressDate.getMonth() + 1).toString().padStart(2, '0');
+            
+            // Create a slug from the congress name (lowercase, spaces to hyphens, remove special chars)
+            const nameSlug = name
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '')
+                .substring(0, 20);
+            
+            const baseId = `${nameSlug}${year}${month}`;
+            
+            // Check if this ID already exists
+            let finalId = baseId;
+            let counter = 1;
+            
+            while (this.congresses.some(congress => congress.id === finalId)) {
+                finalId = `${baseId}-${counter}`;
+                counter++;
+            }
+            
+            console.log(`Generated congress ID: ${finalId}`);
+            return finalId;
+            
+        } catch (error) {
+            console.error('Error generating congress ID:', error);
+            return 'congress-' + Date.now();
+        }
+    }
+
+    async createCongressRequest(congressData) {
+        console.log('Submitting congress to Supabase:', congressData);
+
+        // Create loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-indicator';
+        loadingDiv.style.cssText = `
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            color: #333;
+        `;
+        loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting congress...';
+        
+        const submitBtn = document.querySelector('#congress-form .submit-btn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.parentNode.insertBefore(loadingDiv, submitBtn);
+        }
+
+        try {
+            // Insert into Supabase congresses table
+            const { data, error } = await supabase
+                .from('congresses')
+                .insert([congressData])
+                .select();
+
+            // Remove loading indicator
+            if (loadingDiv.parentNode) {
+                loadingDiv.parentNode.removeChild(loadingDiv);
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
+            console.log('Congress submitted successfully:', data);
+            
+            return {
+                success: true,
+                request_number: congressData.id,
+                data: data[0]
+            };
+
+        } catch (error) {
+            // Remove loading indicator on error
+            if (loadingDiv.parentNode) {
+                loadingDiv.parentNode.removeChild(loadingDiv);
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
+            
+            console.error('Error submitting congress to Supabase:', error);
+            throw error;
+        }
+    }
+
+    showCongressSuccessMessage(requestNumber) {
+        const message = `
+            <div class="success-message" style="
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+                padding: 20px;
+                border-radius: 8px;
+                margin: 20px 0;
+                text-align: center;
+            ">
+                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 16px;"></i>
+                <h3 style="margin: 16px 0; color: #155724;">Congress Submitted Successfully!</h3>
+                <p style="margin: 8px 0; font-size: 16px;">
+                    Your congress submission has been received and is pending admin review.
+                </p>
+                <p style="margin: 8px 0; font-size: 14px;">
+                    <strong>Submission ID:</strong> ${requestNumber}
+                </p>
+                <p style="margin: 16px 0; font-size: 14px; color: #856404;">
+                    You'll be notified at your provided contact information when your congress is approved!
+                </p>
+            </div>
+        `;
+        
+        const form = document.getElementById('congress-form');
+        if (form) {
+            form.insertAdjacentHTML('beforebegin', message);
+            
+            // Scroll to success message
+            const successMsg = form.previousElementSibling;
+            successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Remove message after 10 seconds
+            setTimeout(() => {
+                if (successMsg && successMsg.parentNode) {
+                    successMsg.parentNode.removeChild(successMsg);
+                }
+            }, 10000);
         }
     }
 }
