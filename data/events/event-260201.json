@@ -1,0 +1,20 @@
+{
+  "id": "event-260201",
+  "name": "100% Cuban El Flow",
+  "date": "2026-02-01T19:00:00",
+  "location": "El Flow studio, 9474 Black Mountain Rd, San Diego, CA 92126",
+  "maps_link": "https://maps.app.goo.gl/5rauDGy7XN8ckPjA9",
+  "type": [
+    "timba"
+  ],
+  "music": "DJ",
+  "price": "$15",
+  "description": "100% Cuban Timba, son, reggaeton.\nBachata music in the main room",
+  "contact": "",
+  "featured": false,
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2026-01-06T22:59:50.517+00:00",
+  "updated_at": "2026-01-06T22:59:50.517+00:00",
+  "end_date": "2026-02-01T22:00:00"
+}

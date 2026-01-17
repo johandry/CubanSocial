@@ -1,0 +1,23 @@
+{
+  "id": "event-260102",
+  "name": "Dancing under thr Stars with Manny Cepeda",
+  "date": "2026-01-02T17:00:00",
+  "location": "Quartyard",
+  "maps_link": "https://maps.google.com/?q=Quartyard",
+  "type": [
+    "salsa",
+    "bachata",
+    "merengue",
+    "cumbia"
+  ],
+  "music": "Live",
+  "price": "Free",
+  "description": "",
+  "contact": "8582290617",
+  "featured": false,
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2026-01-02T00:35:23.204+00:00",
+  "updated_at": "2026-01-02T00:35:23.204+00:00",
+  "end_date": "2026-01-03T21:00:00"
+}

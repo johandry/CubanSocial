@@ -1,0 +1,20 @@
+{
+  "id": "event-260124",
+  "name": "Flow SHO: Salsa + Timba",
+  "date": "2026-01-24T22:00:00",
+  "location": "El Flow studio, 9474 Black Mountain Rd, San Diego",
+  "maps_link": "https://maps.google.com/?q=El%20Flow%20studio%2C%209474%20Black%20Mountain%20Rd%2C%20San%20Diego",
+  "type": [
+    "salsa",
+    "timba"
+  ],
+  "music": "DJ",
+  "price": "$15",
+  "description": "50% Timba 50% Salsa in the main room. Bachata in the small room",
+  "contact": "",
+  "featured": false,
+  "recurring": false,
+  "status": "approved",
+  "created_at": "2026-01-06T22:53:33.798+00:00",
+  "updated_at": "2026-01-06T22:53:33.798+00:00"
+}
